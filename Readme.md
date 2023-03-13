@@ -12,6 +12,7 @@ For now, it's not possible to import the `dirigeant` data from the INPI SFTP.
 - docker
 - docker-compose 
 - python3
+- pip3
 
 
 # Install the importer
@@ -26,7 +27,11 @@ pip3 install -r requirements.txt
 
 This elasticsearch db will store all the enterprise data in a persistent local storage (./esdata)
 
-``` 
+```
+mkdir ./.esdata
+# chown the ./.esdata, make sure that docker will be able to write in it.
+
+# Feel free to adjust the 8g RAM heap size (docker-compose.yml)
 docker compose up -d elasticsearch 
 ```
 

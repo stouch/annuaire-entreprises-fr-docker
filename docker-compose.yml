@@ -3,6 +3,7 @@ version: "3"
 
 services:
   elasticsearch:
+    image: elk-with-icu
     build:
       context: .
       dockerfile: ./Dockerfile.elasticsearch
