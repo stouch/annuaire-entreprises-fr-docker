@@ -1,0 +1,70 @@
+---
+version: "3"
+
+services:
+  elasticsearch:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.elasticsearch
+    container_name: elastic-sirene
+    volumes:
+      - ./.esdata:/usr/share/elasticsearch/data
+    networks:
+      - aio-elasticsearch-network
+    environment:
+      - node.name=elastic-sirene
+      - cluster.name=es-docker-cluster
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms8g -Xmx8g -Dlog4j2.formatMsgNoLookups=true"
+      - ELASTICSEARCH_PORT=9200
+      - xpack.security.enabled=false
+      #- xpack.security.enabled=true
+      #- ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    command: bash -c "/usr/local/bin/docker-entrypoint.sh"
+    ports:
+      - "127.0.0.1:9200:9200"
+
+  redis:
+    image: "redis:alpine"
+    container_name: redis
+    volumes:
+      - ./.redisdata:/data
+    env_file:
+      - .env
+    #environment:
+      #- REDIS_PASSWORD=${REDIS_PASSWORD}
+      #- REDIS_REPLICATION_MODE=${REDIS_REPLICATION_MODE}
+    networks:
+      - aio-elasticsearch-network
+    command:
+      # Save if 100 keys are added in every 10 seconds
+      - --save 10 100
+      # Set password
+      # - --requirepass ${REDIS_PASSWORD}
+      # Set max memory to 4Gb
+      - --maxmemory 4gb
+      # Remove less recently used(LRU) keys first
+      - --maxmemory-policy allkeys-lru
+
+  http-proxy:
+    build:
+      context: ./aio
+    container_name: aio
+    env_file:
+      - .env
+    environment:
+      - ELASTIC_PASSWORD=False
+      - ELASTIC_USER=False
+      - ELASTIC_URL=http://elasticsearch:9200  # bridge
+    networks:
+      - aio-elasticsearch-network
+    ports:
+      - "127.0.0.1:4500:4500"
+
+networks:
+  aio-elasticsearch-network:
+    name: aio-elasticsearch-network
