@@ -59,3 +59,11 @@ docker compose up -d
 ```
 
 http://localhost:4500/search?q=Carrefour+chalon+sur+saone
+
+# API Docs
+
+https://github.com/stouch/annuaire-entreprises-fr-docker/blob/main/aio/aio-proxy/aio_proxy/doc/open-api.yml
+
+# Credits 
+
+@etalab
