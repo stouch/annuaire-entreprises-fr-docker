@@ -12,6 +12,9 @@ For now, it's not possible to import the `dirigeant` data from the `inpi.db` fil
 - https://github.com/etalab/rncs_worker_api_entreprise
 - https://www.inpi.fr/sites/default/files/formulaire%20de%20cr%C3%A9ation%20de%20compte_V15_remplissable.pdf
 
+The code of the import script comes from : https://github.com/etalab/annuaire-entreprises-search-infra
+(Last commit : https://github.com/etalab/annuaire-entreprises-search-infra/commit/85020d9bb687288dab4b5eb7dc62611337541d7f (2023-03-10T08:34:03Z))
+
 # Requirements 
 
 - docker
