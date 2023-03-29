@@ -29,6 +29,7 @@ from aio_proxy.parsers.string_parser import clean_parameter, parse_parameter
 from aio_proxy.parsers.terms import (
     check_short_terms_and_no_param,
     parse_and_validate_terms,
+    parse_and_validate_terms_nom,
 )
 from aio_proxy.parsers.tranche_effectif import validate_tranche_effectif_salarie
 from aio_proxy.parsers.type_personne import validate_type_personne
@@ -56,6 +57,7 @@ def extract_text_parameters(
     page = parse_and_validate_page(request)
     per_page = parse_and_validate_per_page(request)
     terms = parse_and_validate_terms(request)
+    nom = parse_and_validate_terms_nom(request)
     activite_principale = validate_activite_principale(
         str_to_list(clean_parameter(request, param="activite_principale"))
     )
@@ -154,6 +156,7 @@ def extract_text_parameters(
 
     parameters = {
         "terms": terms,
+        "nom": nom,
         "activite_principale_unite_legale": activite_principale,
         "commune": code_commune,
         "code_postal": code_postal,

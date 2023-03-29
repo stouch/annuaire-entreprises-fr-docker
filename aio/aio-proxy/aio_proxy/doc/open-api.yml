@@ -77,6 +77,12 @@ paths:
             élus)
           schema:
             type: string
+        - name: nom
+          in: query
+          description: >-
+            Termes de la recherche (dénomination, dirigeants, élus)
+          schema:
+            type: string
         - name: activite_principale
           in: query
           description: >-

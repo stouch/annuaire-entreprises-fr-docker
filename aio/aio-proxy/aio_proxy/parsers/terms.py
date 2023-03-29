@@ -15,6 +15,23 @@ def parse_and_validate_terms(request, default_value=None):
         return terms.upper()
     return terms
 
+def parse_and_validate_terms_nom(request, default_value=None):
+    """Extract enterprise name search terms from request.
+
+    Args:
+        request: HTTP request.
+        default_value:
+
+    Returns:
+        enterprise name terms if given.
+    Raises:
+        ValueError: otherwise.
+    """
+    nom = request.rel_url.query.get("nom", default_value)
+    if nom:
+        return nom.upper()
+    return nom
+
 
 def check_short_terms_and_no_param(params):
     """Prevent performance issues by refusing query terms less than 3 characters.

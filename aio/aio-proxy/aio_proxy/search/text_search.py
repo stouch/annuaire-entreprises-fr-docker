@@ -16,12 +16,16 @@ from aio_proxy.search.helpers.etablissements_filters_used import (
 from aio_proxy.search.parsers.siren import is_siren
 from aio_proxy.search.parsers.siret import is_siret
 from aio_proxy.search.queries.person import search_person
-from aio_proxy.search.queries.text import build_text_query
+from aio_proxy.search.queries.text import (
+    build_text_query, 
+    build_text_query_nom,
+)
 from elasticsearch_dsl import Q
 
 
 def text_search(index, offset: int, page_size: int, **params):
     query_terms = params["terms"]
+    query_terms_nom = params["nom"]
     search_client = index.search()
 
     include_etablissements = params["inclure_etablissements"]
@@ -111,17 +115,43 @@ def text_search(index, offset: int, page_size: int, **params):
             )
             search_client = search_client.query(Q(text_query_with_filters))
 
+            # Filters applied on établissement (name only) with text search
+            if query_terms_nom:
+                nom_query = build_text_query_nom(
+                    terms=query_terms_nom, matching_size=params["matching_size"]
+                )
+                # We can use add_nested_etablissements_filters_to_text_query
+                #  because  nom_query  has the same structure than  text_query
+                nom_query_with_filters = add_nested_etablissements_filters_to_text_query(
+                    nom_query, **params
+                )
+                search_client = search_client.query(Q(nom_query_with_filters))
+
         # Filters applied on établissements without text search
         else:
-            filters_etablissements_query_with_inner_hits = (
-                build_nested_etablissements_filters_query(
-                    with_inner_hits=True, **params
+
+            # Filters applied on établissement name with text search
+            if query_terms_nom:
+                nom_query = build_text_query_nom(
+                    terms=query_terms_nom, matching_size=params["matching_size"]
                 )
-            )
-            if filters_etablissements_query_with_inner_hits:
-                search_client = search_client.query(
-                    Q(filters_etablissements_query_with_inner_hits)
+                # We can use add_nested_etablissements_filters_to_text_query
+                #  because  nom_query  has the same structure than  text_query
+                nom_query_with_filters = add_nested_etablissements_filters_to_text_query(
+                    nom_query, **params
                 )
+                search_client = search_client.query(Q(nom_query_with_filters))
+
+            else:
+                filters_etablissements_query_with_inner_hits = (
+                    build_nested_etablissements_filters_query(
+                        with_inner_hits=True, **params
+                    )
+                )
+                if filters_etablissements_query_with_inner_hits:
+                    search_client = search_client.query(
+                        Q(filters_etablissements_query_with_inner_hits)
+                    )
     else:
         # Text search only without etablissements filters
         if query_terms:
@@ -129,6 +159,13 @@ def text_search(index, offset: int, page_size: int, **params):
                 terms=query_terms, matching_size=params["matching_size"]
             )
             search_client = search_client.query(Q(text_query))
+
+        # Name text search only without etablissements filters
+        if query_terms_nom:
+            nom_query = build_text_query(
+                terms=query_terms_nom, matching_size=params["matching_size"]
+            )
+            search_client = search_client.query(Q(nom_query))
 
     # Search 'élus' only
     if params["type_personne"] == "ELU":
@@ -195,6 +232,7 @@ def text_search(index, offset: int, page_size: int, **params):
     is_text_search = False
     for item in [
         "terms",
+        "nom",
         "nom_personne",
         "prenoms_personne",
     ]:
