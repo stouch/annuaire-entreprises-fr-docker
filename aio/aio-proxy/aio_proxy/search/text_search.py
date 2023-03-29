@@ -118,7 +118,7 @@ def text_search(index, offset: int, page_size: int, **params):
             # Filters applied on établissement (name only) with text search
             if query_terms_nom:
                 nom_query = build_text_query_nom(
-                    terms=query_terms_nom, matching_size=params["matching_size"]
+                    terms_nom=query_terms_nom, matching_size=params["matching_size"]
                 )
                 # We can use add_nested_etablissements_filters_to_text_query
                 #  because  nom_query  has the same structure than  text_query
@@ -133,7 +133,7 @@ def text_search(index, offset: int, page_size: int, **params):
             # Filters applied on établissement name with text search
             if query_terms_nom:
                 nom_query = build_text_query_nom(
-                    terms=query_terms_nom, matching_size=params["matching_size"]
+                    terms_nom=query_terms_nom, matching_size=params["matching_size"]
                 )
                 # We can use add_nested_etablissements_filters_to_text_query
                 #  because  nom_query  has the same structure than  text_query
