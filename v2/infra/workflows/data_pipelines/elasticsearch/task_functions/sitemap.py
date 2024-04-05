@@ -12,7 +12,7 @@ from dag_datalake_sirene.workflows.data_pipelines.elasticsearch.sqlite.sitemap i
 )
 from dag_datalake_sirene.config import (
     AIRFLOW_ELK_DATA_DIR,
-    AIRFLOW_ENV,
+    DATA_ENV,
 )
 
 
@@ -20,8 +20,8 @@ def create_sitemap():
     sqlite_client = SqliteClient(AIRFLOW_ELK_DATA_DIR + "sirene.db")
     sqlite_client.execute(select_sitemap_fields_query)
 
-    if os.path.exists(AIRFLOW_ELK_DATA_DIR + "sitemap-" + AIRFLOW_ENV + ".csv"):
-        os.remove(AIRFLOW_ELK_DATA_DIR + "sitemap-" + AIRFLOW_ENV + ".csv")
+    if os.path.exists(AIRFLOW_ELK_DATA_DIR + "sitemap-" + DATA_ENV + ".csv"):
+        os.remove(AIRFLOW_ELK_DATA_DIR + "sitemap-" + DATA_ENV + ".csv")
 
     chunk_unites_legales_sqlite = 1
     while chunk_unites_legales_sqlite:
@@ -69,7 +69,7 @@ def create_sitemap():
                     f"{ul['activite_principale_unite_legale']},{slug}\n"
                 )
 
-        with open(AIRFLOW_ELK_DATA_DIR + "sitemap-" + AIRFLOW_ENV + ".csv", "a+") as f:
+        with open(AIRFLOW_ELK_DATA_DIR + "sitemap-" + DATA_ENV + ".csv", "a+") as f:
             f.write(slugs)
 
 
@@ -78,7 +78,7 @@ def update_sitemap():
         list_files=[
             {
                 "source_path": AIRFLOW_ELK_DATA_DIR,
-                "source_name": f"sitemap-{AIRFLOW_ENV}.csv",
+                "source_name": f"sitemap-{DATA_ENV}.csv",
                 "dest_path": "",
                 "dest_name": "sitemap.csv",
                 "content_type": "text/csv",

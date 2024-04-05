@@ -27,7 +27,7 @@ from dag_datalake_sirene.workflows.data_pipelines.etl.sqlite.helpers import (
     execute_query,
     get_table_count,
 )
-from dag_datalake_sirene.config import AIRFLOW_ETL_DATA_DIR
+from dag_datalake_sirene.config import DATA_DIR
 from dag_datalake_sirene.config import (
     SIRENE_DATABASE_LOCATION,
     RNE_DATABASE_LOCATION,
@@ -43,7 +43,7 @@ def create_table(query, table_name, index, sirene_file_type):
         index_column="siren",
     )
     for df_unite_legale in preprocess_unite_legale_data(
-        AIRFLOW_ETL_DATA_DIR, sirene_file_type
+        DATA_DIR, sirene_file_type
     ):
         df_unite_legale.to_sql(
             table_name, sqlite_client.db_conn, if_exists="append", index=False
@@ -129,7 +129,7 @@ def create_historique_unite_legale_table(**kwargs):
     )
 
     for df_hist_unite_legale in preprocess_historique_unite_legale_data(
-        AIRFLOW_ETL_DATA_DIR,
+        DATA_DIR,
     ):
         df_hist_unite_legale.to_sql(
             table_name, sqlite_client.db_conn, if_exists="append", index=False

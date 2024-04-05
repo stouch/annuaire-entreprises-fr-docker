@@ -5,7 +5,7 @@ import requests
 import os
 from datetime import datetime, date
 from unicodedata import normalize
-from dag_datalake_sirene.config import AIRFLOW_ENV
+from dag_datalake_sirene.config import DATA_ENV
 
 
 def str_to_list(string):
@@ -93,8 +93,8 @@ def drop_exact_duplicates(list_dict):
 def publish_mattermost(
     text,
 ) -> None:
-    data = {"text": f"{text} ({AIRFLOW_ENV})"}
-    if AIRFLOW_ENV == "prod" or AIRFLOW_ENV == "staging":
+    data = {"text": f"{text} ({DATA_ENV})"}
+    if DATA_ENV == "prod" or DATA_ENV == "staging":
         r = requests.post(
             "https://mattermost.incubateur.net/hooks/z4k8a159yjnx584idit1ubf74r",
             json=data,

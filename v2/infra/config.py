@@ -1,115 +1,114 @@
-from airflow.models import Variable
+#from airflow.models import Variable
 import json
 
 # Airflow
-AIRFLOW_DAG_HOME = Variable.get("AIRFLOW_DAG_HOME", "/opt/airflow/dags/")
-AIRFLOW_DAG_TMP = Variable.get("AIRFLOW_DAG_TMP", "/tmp/")
-AIRFLOW_DAG_FOLDER = "dag_datalake_sirene/"
-AIRFLOW_ETL_DAG_NAME = "extract_transform_load_db"
-AIRFLOW_ELK_DAG_NAME = "index_elasticsearch"
-AIRFLOW_SNAPSHOT_DAG_NAME = "snapshot_index"
-AIRFLOW_SNAPSHOT_ROLLBACK_DAG_NAME = "snapshot_index_rollback"
-AIRFLOW_ENV = Variable.get("ENV", "dev")
-AIRFLOW_URL = Variable.get("AIRFLOW_URL", "")
-AIRFLOW_ETL_DATA_DIR = (
-    AIRFLOW_DAG_TMP + AIRFLOW_DAG_FOLDER + AIRFLOW_ETL_DAG_NAME + "/data/"
-)
-AIRFLOW_ELK_DATA_DIR = (
-    AIRFLOW_DAG_TMP + AIRFLOW_DAG_FOLDER + AIRFLOW_ELK_DAG_NAME + "/data/"
-)
-SIRENE_DATABASE_LOCATION = AIRFLOW_ETL_DATA_DIR + "sirene.db"
+#AIRFLOW_DAG_HOME = Variable.get("AIRFLOW_DAG_HOME", "/opt/airflow/dags/")
+#AIRFLOW_DAG_TMP = Variable.get("AIRFLOW_DAG_TMP", "/tmp/")
+#AIRFLOW_DAG_FOLDER = "dag_datalake_sirene/"
+#AIRFLOW_ETL_DAG_NAME = "extract_transform_load_db"
+#AIRFLOW_ELK_DAG_NAME = "index_elasticsearch"
+#AIRFLOW_SNAPSHOT_DAG_NAME = "snapshot_index"
+#AIRFLOW_SNAPSHOT_ROLLBACK_DAG_NAME = "snapshot_index_rollback"
+#AIRFLOW_ENV = Variable.get("ENV", "dev")
+#AIRFLOW_URL = Variable.get("AIRFLOW_URL", "")
+#AIRFLOW_ETL_DATA_DIR = (
+#    AIRFLOW_DAG_TMP + AIRFLOW_DAG_FOLDER + AIRFLOW_ETL_DAG_NAME + "/data/"
+#)
+#AIRFLOW_ELK_DATA_DIR = (
+#    AIRFLOW_DAG_TMP + AIRFLOW_DAG_FOLDER + AIRFLOW_ELK_DAG_NAME + "/data/"
+#)
+
+DATA_TMP = "./tmp/" # dont forget the trailing slash
+DATA_DIR = "./data/"
+DATA_ENV = "dev"
+
+SIRENE_DATABASE_LOCATION = DATA_DIR + "sirene.db"
 SIRENE_MINIO_DATA_PATH = "sirene/database/"
-RNE_DATABASE_LOCATION = AIRFLOW_ETL_DATA_DIR + "rne.db"
-RNE_DB_TMP_FOLDER = f"{AIRFLOW_DAG_TMP}rne/database/"
-RNE_MINIO_DATA_PATH = "rne/database/"
-RNE_LATEST_DATE_FILE = "latest_rne_date.json"
-RNE_MINIO_FLUX_DATA_PATH = "rne/flux/data/"
-RNE_MINIO_STOCK_DATA_PATH = "rne/stock/data/"
-RNE_FLUX_TMP_FOLDER = f"{AIRFLOW_DAG_TMP}rne/flux/"
-RNE_FLUX_DATADIR = f"{RNE_FLUX_TMP_FOLDER}data"
-RNE_DEFAULT_START_DATE = "2023-07-01"
-RNE_STOCK_TMP_FOLDER = f"{AIRFLOW_DAG_TMP}rne/stock/"
-RNE_STOCK_ZIP_FILE_PATH = f"{RNE_STOCK_TMP_FOLDER}stock_rne.zip"
-RNE_STOCK_EXTRACTED_FILES_PATH = f"{RNE_STOCK_TMP_FOLDER}extracted/"
-RNE_STOCK_DATADIR = f"{RNE_STOCK_TMP_FOLDER}data"
-RNE_DAG_FOLDER = "dag_datalake_sirene/data_pipelines/"
-METADATA_CC_TMP_FOLDER = f"{AIRFLOW_DAG_TMP}metadata/cc/"
-METADATA_CC_MINIO_PATH = "metadata/cc/"
-INSEE_FLUX_TMP_FOLDER = f"{AIRFLOW_DAG_TMP}sirene/flux/"
-MARCHE_INCLUSION_TMP_FOLDER = f"{AIRFLOW_DAG_TMP}marche_inclusion/"
-AGENCE_BIO_TMP_FOLDER = f"{AIRFLOW_DAG_TMP}agence_bio/"
-UAI_TMP_FOLDER = f"{AIRFLOW_DAG_TMP}uai/"
-BILANS_FINANCIERS_TMP_FOLDER = f"{AIRFLOW_DAG_TMP}bilans_financiers/"
+RNE_DATABASE_LOCATION = DATA_DIR + "rne.db" # dont have this data outside official Etalab env
+
+#RNE_DB_TMP_FOLDER = f"{DATA_TMP}rne/database/"
+#RNE_MINIO_DATA_PATH = "rne/database/"
+#RNE_LATEST_DATE_FILE = "latest_rne_date.json"
+#RNE_MINIO_FLUX_DATA_PATH = "rne/flux/data/"
+#RNE_MINIO_STOCK_DATA_PATH = "rne/stock/data/"
+#RNE_FLUX_TMP_FOLDER = f"{DATA_TMP}rne/flux/"
+#RNE_FLUX_DATADIR = f"{RNE_FLUX_TMP_FOLDER}data"
+#RNE_DEFAULT_START_DATE = "2023-07-01"
+#RNE_STOCK_TMP_FOLDER = f"{DATA_TMP}rne/stock/"
+#RNE_STOCK_ZIP_FILE_PATH = f"{RNE_STOCK_TMP_FOLDER}stock_rne.zip"
+#RNE_STOCK_EXTRACTED_FILES_PATH = f"{RNE_STOCK_TMP_FOLDER}extracted/"
+#RNE_STOCK_DATADIR = f"{RNE_STOCK_TMP_FOLDER}data"
+#RNE_DAG_FOLDER = "dag_datalake_sirene/data_pipelines/"
+#METADATA_CC_TMP_FOLDER = f"{DATA_TMP}metadata/cc/"
+#METADATA_CC_MINIO_PATH = "metadata/cc/"
+#INSEE_FLUX_TMP_FOLDER = f"{DATA_TMP}sirene/flux/"
+#MARCHE_INCLUSION_TMP_FOLDER = f"{DATA_TMP}marche_inclusion/"
+#AGENCE_BIO_TMP_FOLDER = f"{DATA_TMP}agence_bio/"
+#UAI_TMP_FOLDER = f"{DATA_TMP}uai/"
+#BILANS_FINANCIERS_TMP_FOLDER = f"{DATA_TMP}bilans_financiers/"
 
 # Insee
-INSEE_SECRET_BEARER = Variable.get("SECRET_BEARER_INSEE", None)
-INSEE_API_URL = "https://api.insee.fr/entreprises/sirene/V3/"
+#INSEE_SECRET_BEARER = Variable.get("SECRET_BEARER_INSEE", None)
+#INSEE_API_URL = "https://api.insee.fr/entreprises/sirene/V3/"
 
 # Notification
-TCHAP_ANNUAIRE_WEBHOOK = Variable.get("TCHAP_ANNUAIRE_WEBHOOK", "")
-TCHAP_ANNUAIRE_ROOM_ID = Variable.get("TCHAP_ANNUAIRE_ROOM_ID", "")
-EMAIL_LIST = Variable.get("EMAIl_LIST", "")
+#TCHAP_ANNUAIRE_WEBHOOK = Variable.get("TCHAP_ANNUAIRE_WEBHOOK", "")
+#TCHAP_ANNUAIRE_ROOM_ID = Variable.get("TCHAP_ANNUAIRE_ROOM_ID", "")
+#EMAIL_LIST = Variable.get("EMAIl_LIST", "")
 
 # Minio
-MINIO_URL = Variable.get("MINIO_URL", "object.files.data.gouv.fr")
-MINIO_BUCKET = Variable.get("MINIO_BUCKET", "")
-MINIO_BUCKET_DATA_PIPELINE = Variable.get("MINIO_BUCKET_DATA_PIPELINE", None)
-MINIO_USER = Variable.get("MINIO_USER", "")
-MINIO_PASSWORD = Variable.get("MINIO_PASSWORD", "")
+#MINIO_URL = Variable.get("MINIO_URL", "object.files.data.gouv.fr")
+#MINIO_BUCKET = Variable.get("MINIO_BUCKET", "")
+#MINIO_BUCKET_DATA_PIPELINE = Variable.get("MINIO_BUCKET_DATA_PIPELINE", None)
+#MINIO_USER = Variable.get("MINIO_USER", "")
+#MINIO_PASSWORD = Variable.get("MINIO_PASSWORD", "")
 
 # RNE
-RNE_FTP_URL = Variable.get("RNE_FTP_URL", "")
-RNE_AUTH = json.loads(Variable.get("RNE_AUTH", "[]"))
-RNE_API_TOKEN_URL = "https://registre-national-entreprises.inpi.fr/api/sso/login"
-RNE_API_DIFF_URL = "https://registre-national-entreprises.inpi.fr/api/companies/diff?"
+#RNE_FTP_URL = Variable.get("RNE_FTP_URL", "")
+#RNE_AUTH = json.loads(Variable.get("RNE_AUTH", "[]"))
+#RNE_API_TOKEN_URL = "https://registre-national-entreprises.inpi.fr/api/sso/login"
+#RNE_API_DIFF_URL = "https://registre-national-entreprises.inpi.fr/api/companies/diff?"
 
 # MARCHE INCLUSION
-MARCHE_INCLUSION_API_URL = "https://lemarche.inclusion.beta.gouv.fr/api/siae/?"
-SECRET_TOKEN_MARCHE_INCLUSION = Variable.get("SECRET_TOKEN_MARCHE_INCLUSION", "")
+#MARCHE_INCLUSION_API_URL = "https://lemarche.inclusion.beta.gouv.fr/api/siae/?"
+#SECRET_TOKEN_MARCHE_INCLUSION = Variable.get("SECRET_TOKEN_MARCHE_INCLUSION", "")
 # AIO
-AIO_URL = Variable.get("AIO_URL", None)
-COLOR_URL = Variable.get("COLOR_URL", None)
-PATH_AIO = Variable.get("PATH_AIO", None)
-COLOR_IS_DAILY = bool(Variable.get("COLOR_IS_DAILY", "False"))
+#AIO_URL = Variable.get("AIO_URL", None)
+#COLOR_URL = Variable.get("COLOR_URL", None)
+#PATH_AIO = Variable.get("PATH_AIO", None)
+#COLOR_IS_DAILY = bool(Variable.get("COLOR_IS_DAILY", "False"))
 
 # Redis
 REDIS_HOST = "redis"
 REDIS_PORT = "6379"
 REDIS_DB = "0"
-REDIS_PASSWORD = Variable.get("REDIS_PASSWORD", None)
 
 # ElasticSearch
-ELASTIC_PASSWORD = Variable.get("ELASTIC_PASSWORD", None)
-ELASTIC_URL = Variable.get("ELASTIC_URL", None)
-ELASTIC_USER = Variable.get("ELASTIC_USER", None)
 ELASTIC_BULK_SIZE = 1500
 ELASTIC_SHARDS = 2
 ELASTIC_REPLICAS = 0
 
-ELASTIC_MAX_LIVE_VERSIONS = int(Variable.get("ELASTIC_MAX_LIVE_VERSIONS", 1))
+ELASTIC_MAX_LIVE_VERSIONS = 1
 
-ELASTIC_SNAPSHOT_REPOSITORY = Variable.get("ELASTIC_SNAPSHOT_REPOSITORY", "data-prod")
+ELASTIC_SNAPSHOT_REPOSITORY = "data-prod"
 ELASTIC_SNAPSHOT_MAX_REVISIONS = 5
-ELASTIC_SNAPSHOT_MINIO_STATE_PATH = Variable.get(
-    "ELASTIC_SNAPSHOT_MINIO_STATE_PATH", "elastic_index_version"
-)
+ELASTIC_SNAPSHOT_MINIO_STATE_PATH = "elastic_index_version"
 
-ELASTIC_DOWNSTREAM_ALIAS = Variable.get("ELASTIC_DOWNSTREAM_ALIAS", "siren-reader")
+ELASTIC_DOWNSTREAM_ALIAS = "siren-reader"
 # comma separated URL
-ELASTIC_DOWNSTREAM_URLS = Variable.get("ELASTIC_DOWNSTREAM_URLS", "")
-ELASTIC_DOWNSTREAM_USER = Variable.get("ELASTIC_DOWNSTREAM_USER", "")
-ELASTIC_DOWNSTREAM_PASSWORD = Variable.get("ELASTIC_DOWNSTREAM_PASSWORD", "")
+ELASTIC_DOWNSTREAM_URLS = ""
+ELASTIC_DOWNSTREAM_USER = ""
+ELASTIC_DOWNSTREAM_PASSWORD = ""
 
-API_URL = Variable.get("API_URL", "")
-API_IS_REMOTE = Variable.get("API_IS_REMOTE", "False").lower() not in ["false", "0"]
+#API_IS_REMOTE = Variable.get("API_IS_REMOTE", "False").lower() not in ["false", "0"]
 
 # Datasets
 URL_AGENCE_BIO = (
-    f"https://object.files.data.gouv.fr/opendata/ae/{AIRFLOW_ENV}/agence_bio"
+    f"https://object.files.data.gouv.fr/opendata/ae/{DATA_ENV}/agence_bio"
     "/latest/agence_bio_certifications.csv"
 )
 URL_BILANS_FINANCIERS = (
-    f"https://object.files.data.gouv.fr/opendata/ae/{AIRFLOW_ENV}/bilans_financiers"
+    f"https://object.files.data.gouv.fr/opendata/ae/{DATA_ENV}/bilans_financiers"
     "/latest/synthese_bilans.csv"
 )
 URL_COLTER_REGIONS = (
@@ -162,7 +161,7 @@ URL_RGE = (
     "liste-des-entreprises-rge-2/lines?size=10000&select=siret%2Ccode_qualification"
 )
 URL_UAI = (
-    f"https://object.files.data.gouv.fr/opendata/ae/{AIRFLOW_ENV}/uai"
+    f"https://object.files.data.gouv.fr/opendata/ae/{DATA_ENV}/uai"
     "/latest/annuaire_uai.csv"
 )
 URL_UNITE_LEGALE = "https://files.data.gouv.fr/insee-sirene/StockUniteLegale_utf8.zip"

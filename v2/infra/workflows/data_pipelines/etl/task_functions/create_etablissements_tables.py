@@ -37,7 +37,7 @@ from dag_datalake_sirene.workflows.data_pipelines.etl.sqlite.queries.etablisseme
     update_sieges_table_fields_with_rne_data_query,
 )
 # fmt: on
-from dag_datalake_sirene.config import AIRFLOW_ETL_DATA_DIR
+from dag_datalake_sirene.config import DATA_DIR
 from dag_datalake_sirene.config import (
     SIRENE_DATABASE_LOCATION,
     RNE_DATABASE_LOCATION,
@@ -186,7 +186,7 @@ def create_historique_etablissement_table(**kwargs):
     )
 
     for df_hist_etablissement in preprocess_historique_etablissement_data(
-        AIRFLOW_ETL_DATA_DIR,
+        DATA_DIR,
     ):
         df_hist_etablissement.to_sql(
             table_name, sqlite_client.db_conn, if_exists="append", index=False
