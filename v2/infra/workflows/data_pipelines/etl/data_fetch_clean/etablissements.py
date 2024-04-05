@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 import shutil
 from datetime import datetime, timedelta
-from dag_datalake_sirene.helpers.minio_helpers import minio_client
+
 from dag_datalake_sirene.config import (
     URL_ETABLISSEMENTS,
     URL_ETABLISSEMENTS_HISTORIQUE,
@@ -71,84 +71,6 @@ def download_stock(departement):
     )
     return df_dep
 
-
-def download_flux(data_dir):
-    today = datetime.today()
-    if today.day == 1:
-        # Calculate the first day of the previous month
-        first_day_of_previous_month = today - timedelta(days=1)
-        year_month = first_day_of_previous_month.strftime("%Y-%m")
-    else:
-        year_month = datetime.today().strftime("%Y-%m")
-    logging.info(f"Downloading flux for : {year_month}")
-    minio_client.get_files(
-        list_files=[
-            {
-                "source_path": "insee/sirene/flux/",
-                "source_name": f"flux_etablissement_{year_month}.csv.gz",
-                "dest_path": f"{data_dir}",
-                "dest_name": f"flux_etablissement_{year_month}.csv.gz",
-            }
-        ],
-    )
-    df_flux = pd.read_csv(
-        f"{data_dir}flux_etablissement_{year_month}.csv.gz",
-        dtype=str,
-        compression="gzip",
-        usecols=[
-            "siren",
-            "siret",
-            "dateCreationEtablissement",
-            "trancheEffectifsEtablissement",
-            "caractereEmployeurEtablissement",
-            "anneeEffectifsEtablissement",
-            "dateDernierTraitementEtablissement",
-            "activitePrincipaleRegistreMetiersEtablissement",
-            "etablissementSiege",
-            "numeroVoieEtablissement",
-            "libelleVoieEtablissement",
-            "codePostalEtablissement",
-            "libelleCommuneEtablissement",
-            "libelleCedexEtablissement",
-            "typeVoieEtablissement",
-            "codeCommuneEtablissement",
-            "codeCedexEtablissement",
-            "complementAdresseEtablissement",
-            "distributionSpecialeEtablissement",
-            "complementAdresse2Etablissement",
-            "indiceRepetition2Etablissement",
-            "libelleCedex2Etablissement",
-            "codeCedex2Etablissement",
-            "numeroVoie2Etablissement",
-            "typeVoie2Etablissement",
-            "libelleVoie2Etablissement",
-            "codeCommune2Etablissement",
-            "libelleCommune2Etablissement",
-            "distributionSpeciale2Etablissement",
-            "dateDebut",
-            "etatAdministratifEtablissement",
-            "enseigne1Etablissement",
-            "enseigne1Etablissement",
-            "enseigne2Etablissement",
-            "enseigne3Etablissement",
-            "denominationUsuelleEtablissement",
-            "activitePrincipaleEtablissement",
-            "indiceRepetitionEtablissement",
-            "libelleCommuneEtrangerEtablissement",
-            "codePaysEtrangerEtablissement",
-            "libellePaysEtrangerEtablissement",
-            "libelleCommuneEtranger2Etablissement",
-            "codePaysEtranger2Etablissement",
-            "libellePaysEtranger2Etablissement",
-            "statutDiffusionEtablissement",
-        ],
-    )
-    df_flux["etablissementSiege"] = df_flux["etablissementSiege"].apply(
-        lambda x: x.lower()
-    )
-    return df_flux
-
-
 def download_historique(data_dir):
     r = requests.get(URL_ETABLISSEMENTS_HISTORIQUE, allow_redirects=True)
     open(data_dir + "StockEtablissementHistorique_utf8.zip", "wb").write(r.content)
@@ -162,8 +84,6 @@ def download_historique(data_dir):
 def preprocess_etablissement_data(siret_file_type, departement=None, data_dir=None):
     if siret_file_type == "stock":
         df_siret = download_stock(departement)
-    if siret_file_type == "flux":
-        df_siret = download_flux(data_dir)
 
     df_siret = df_siret.rename(
         columns={

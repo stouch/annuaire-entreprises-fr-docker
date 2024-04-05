@@ -3,7 +3,6 @@ import shutil
 import logging
 import pandas as pd
 import requests
-from dag_datalake_sirene.helpers.minio_helpers import minio_client
 from dag_datalake_sirene.config import (
     URL_UNITE_LEGALE,
     URL_UNITE_LEGALE_HISTORIQUE,
@@ -29,41 +28,9 @@ def download_stock(data_dir):
     )
     return df_iterator
 
-
-def download_flux(data_dir):
-    # If first of the month, use previous month data
-    today = datetime.today()
-    if today.day == 1:
-        # Calculate the first day of the previous month
-        first_day_of_previous_month = today - timedelta(days=1)
-        year_month = first_day_of_previous_month.strftime("%Y-%m")
-    else:
-        year_month = datetime.today().strftime("%Y-%m")
-    logging.info(f"Downloading flux for : {year_month}")
-    minio_client.get_files(
-        list_files=[
-            {
-                "source_path": "insee/sirene/flux/",
-                "source_name": f"flux_unite_legale_{year_month}.csv.gz",
-                "dest_path": f"{data_dir}",
-                "dest_name": f"flux_unite_legale_{year_month}.csv.gz",
-            }
-        ],
-    )
-    df_iterator = pd.read_csv(
-        f"{data_dir}flux_unite_legale_{year_month}.csv.gz",
-        chunksize=100000,
-        dtype=str,
-        compression="gzip",
-    )
-    return df_iterator
-
-
 def preprocess_unite_legale_data(data_dir, sirene_file_type):
     if sirene_file_type == "stock":
         df_iterator = download_stock(data_dir)
-    if sirene_file_type == "flux":
-        df_iterator = download_flux(data_dir)
 
     # Insert rows in database by chunk
     for i, df_unite_legale in enumerate(df_iterator):

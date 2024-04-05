@@ -72,17 +72,7 @@ def create_unite_legale_table(**kwargs):
         "index_siren",
         "stock",
     )
-    kwargs["ti"].xcom_push(key="count_unites_legales", value=counts)
-
-
-def create_flux_unite_legale_table(**kwargs):
-    counts = create_table(
-        create_table_flux_unite_legale_query,
-        "flux_unite_legale",
-        "index_flux_siren",
-        "flux",
-    )
-    kwargs["ti"].xcom_push(key="count_flux_unites_legales", value=counts)
+    #airflow: kwargs["ti"].xcom_push(key="count_unites_legales", value=counts)
 
 
 def replace_unite_legale_table():
@@ -148,9 +138,9 @@ def create_historique_unite_legale_table(**kwargs):
             f"{table_name} table!"
         )
     sqlite_client.commit_and_close_conn()
-    kwargs["ti"].xcom_push(
-        key="count_historique_unites_legales", value=count_unites_legales
-    )
+    #airflow: kwargs["ti"].xcom_push(
+    #    key="count_historique_unites_legales", value=count_unites_legales
+    #)
 
 
 def create_date_fermeture_unite_legale_table(**kwargs):
@@ -169,9 +159,9 @@ def create_date_fermeture_unite_legale_table(**kwargs):
             f"{table_name} table!"
         )
     sqlite_client.commit_and_close_conn()
-    kwargs["ti"].xcom_push(
-        key="count_date_fermeture_unites_legales", value=count_unites_legales
-    )
+    #airflow: kwargs["ti"].xcom_push(
+    #airflow:     key="count_date_fermeture_unites_legales", value=count_unites_legales
+    #airflow: )
 
 
 def insert_date_fermeture_unite_legale(**kwargs):

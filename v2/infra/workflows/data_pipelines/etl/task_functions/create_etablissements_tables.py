@@ -64,32 +64,6 @@ def create_etablissements_table():
     del df_dep
     sqlite_client.commit_and_close_conn()
 
-
-def create_flux_etablissements_table():
-    sqlite_client = create_table_model(
-        table_name="flux_siret",
-        create_table_query=create_table_flux_etablissements_query,
-        create_index_func=create_index,
-        index_name="index_flux_siret",
-        index_column="siren",
-    )
-    # Upload flux data
-    df_siret = preprocess_etablissement_data("flux", None, AIRFLOW_ETL_DATA_DIR)
-    df_siret.to_sql(
-        "flux_siret",
-        sqlite_client.db_conn,
-        if_exists="append",
-        index=False,
-    )
-    for row in sqlite_client.execute(get_table_count("flux_siret")):
-        logging.info(
-            f"************ {row} total records have been added to the "
-            f"`flux établissements` table!"
-        )
-    del df_siret
-    sqlite_client.commit_and_close_conn()
-
-
 def create_siege_only_table(**kwargs):
     sqlite_client = create_table_model(
         table_name="siretsiege",
@@ -104,7 +78,7 @@ def create_siege_only_table(**kwargs):
             f"************ {count_sieges} total records have been added to the "
             f"sieges table!"
         )
-    kwargs["ti"].xcom_push(key="count_sieges", value=count_sieges[0])
+    #airflow: kwargs["ti"].xcom_push(key="count_sieges", value=count_sieges[0])
     sqlite_client.commit_and_close_conn()
 
 
@@ -205,9 +179,9 @@ def create_historique_etablissement_table(**kwargs):
             f"{table_name} table!"
         )
     sqlite_client.commit_and_close_conn()
-    kwargs["ti"].xcom_push(
-        key="count_historique_etablissements", value=count_etablissements
-    )
+    #airflow: kwargs["ti"].xcom_push(
+    #    key="count_historique_etablissements", value=count_etablissements
+    #)
 
 
 def create_date_fermeture_etablissement_table(**kwargs):
@@ -226,9 +200,9 @@ def create_date_fermeture_etablissement_table(**kwargs):
             f"{table_name} table!"
         )
     sqlite_client.commit_and_close_conn()
-    kwargs["ti"].xcom_push(
-        key="count_date_fermeture_etablissements", value=count_etablissements
-    )
+    #airflow: kwargs["ti"].xcom_push(
+    #    key="count_date_fermeture_etablissements", value=count_etablissements
+    #)
 
 
 def insert_date_fermeture_etablissement(**kwargs):
