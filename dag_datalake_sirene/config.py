@@ -20,7 +20,7 @@ import os
 #)
 
 DATA_TMP = "./tmp/" # dont forget the trailing slash
-DATA_DIR = "./data/"
+DATA_DIR = os.getenv('DATA_DIRECTORY') if os.getenv('DATA_DIRECTORY') else "./data/"
 DATA_ENV = "prod"
 
 SIRENE_DATABASE_LOCATION = DATA_DIR + "sirene.db"
