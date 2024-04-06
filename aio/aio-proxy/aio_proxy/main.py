@@ -1,16 +1,21 @@
 import logging
+import os
 import pathlib
 
 import aiohttp
 from aiohttp import web
 from aiohttp_swagger3 import ReDocUiSettings, SwaggerDocs
-from elasticapm.contrib.aiohttp import ElasticAPM
+from dotenv import load_dotenv
 
 from aio_proxy.routes import routes
 from aio_proxy.settings import config
 
+load_dotenv()
+
 BASE_DIR = pathlib.Path(__file__).parent.parent
 open_api_path = BASE_DIR / "aio_proxy" / "doc" / "open-api.yml"
+ENV = os.getenv("ENV")
+
 
 def main():
     logging.basicConfig(level=logging.INFO)
@@ -28,7 +33,6 @@ def main():
         components=open_api_path,
     )
     app["config"] = config
-
     web.run_app(app, host=config["host"], port=config["port"])
     app.on_startup.append(swagger)
 

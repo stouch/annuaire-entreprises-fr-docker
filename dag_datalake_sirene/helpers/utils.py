@@ -1,21 +1,21 @@
 import filecmp
-import logging
-logger = logging.getLogger(__name__)
 from ast import literal_eval
-from datetime import datetime
-from unicodedata import normalize
-
+import logging
 import requests
+import os
+from datetime import datetime, date
+from unicodedata import normalize
+from dag_datalake_sirene.config import DATA_ENV
 
-from dag_datalake_sirene.task_functions.global_variables import (
-    ENV
-)
 
 def str_to_list(string):
     if string is None:
         return None
-    li = literal_eval(string)
-    return li
+    try:
+        li = literal_eval(string)
+        return li
+    except ValueError:
+        logging.info(f"////////////////Could not evaluate: {string}")
 
 
 def str_to_bool(string):
@@ -28,10 +28,13 @@ def str_to_bool(string):
 
 
 def sqlite_str_to_bool(string):
-    if string is None:
-        return None
+    """Return True only if sqlite value is one, else (None or False) return None
+    SQlite tables (egapro, entrepreneur spectacle, qualiopi) only include siren
+    numbers which have those labels otherwise it's empty hence this function to make
+    sure it gets labeled False"""
     if string == 1:
         return True
+    return False
 
 
 def unique_list(lst):
@@ -76,7 +79,7 @@ def normalize_date(date_string):
         except ValueError:
             pass
 
-    logging.info(f"Date is not in expected format: {date_string}")
+    logging.debug(f"Date is not in expected format: {date_string}")
 
 
 def drop_exact_duplicates(list_dict):
@@ -90,8 +93,8 @@ def drop_exact_duplicates(list_dict):
 def publish_mattermost(
     text,
 ) -> None:
-    data = {"text": f"{text} ({ENV})"}
-    if ENV == "prod" or ENV == "staging":
+    data = {"text": f"{text} ({DATA_ENV})"}
+    if DATA_ENV == "prod" or DATA_ENV == "staging":
         r = requests.post(
             "https://mattermost.incubateur.net/hooks/z4k8a159yjnx584idit1ubf74r",
             json=data,
@@ -105,3 +108,69 @@ def compare_versions_file(
 ):
     should_continue = not filecmp.cmp(original_file, new_file)
     return should_continue
+
+
+def check_if_monday():
+    return date.today().weekday() == 0
+
+
+def get_last_line(file_path):
+    """
+    Retrieve the last line from a given file.
+
+    Parameters:
+    - file_path (str): The path to the file.
+
+    Returns:
+    - str or None: The last line if found, or None if the file is empty.
+    """
+    try:
+        with open(file_path, "rb") as f:
+            try:  # catch OSError in case of a one line file
+                f.seek(-2, os.SEEK_END)
+                while f.read(1) != b"\n":
+                    f.seek(-2, os.SEEK_CUR)
+            except OSError as error:
+                logging.error(f"{error}")
+                f.seek(0)
+            last_line = f.readline().decode()
+            logging.info(f"Last line: {last_line}")
+
+        return last_line if last_line else None
+    except Exception as e:
+        logging.error(f"Error while reading last line: {e}")
+        return None
+
+
+def convert_date_format(original_date_string):
+    try:
+        if original_date_string is None:
+            return None
+        # Convert to datetime object
+        original_datetime = datetime.strptime(
+            original_date_string, "%Y-%m-%d %H:%M:%S%z"
+        )
+
+        # Format
+        converted_date_string = original_datetime.strftime("%Y-%m-%dT%H:%M:%S")
+
+        return converted_date_string
+    except Exception as e:
+        # Handle invalid date string
+        logging.error(f"Error: {e}")
+        return None
+
+
+def get_current_year():
+    return datetime.now().year
+
+
+def get_fiscal_year(date):
+    # Get the fiscal year based on the month of the date
+    return date.year if date.month >= 7 else date.year - 1
+
+
+def remove_spaces(string):
+    if string is None:
+        return None
+    return string.replace(" ", "")

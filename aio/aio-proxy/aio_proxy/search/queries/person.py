@@ -3,25 +3,32 @@ from elasticsearch_dsl import query
 
 def search_person(
     search,
+    search_params,
     param_nom,
     param_prenom,
     param_date_min,
     param_date_max,
     list_persons,
-    **params,
 ):
     search_options = []
     for person in list_persons:
         person_filters = []
         boost_queries = []
         # Nom
-        nom_person = params.get(param_nom, None)
+        nom_person = search_params.dict().get(param_nom, "None")
         if nom_person:
             # match queries returns any document containing the search item,
             # even if it contains another item
             for nom in nom_person.split(" "):
                 person_filters.append(
-                    {"match": {person["type_person"] + "." + person["match_nom"]: nom}}
+                    {
+                        "match": {
+                            "unite_legale."
+                            + person["type_person"]
+                            + "."
+                            + person["match_nom"]: nom
+                        }
+                    }
                 )
             # match_phrase on the name `keyword` makes sure to boost the documents
             # with the exact match
@@ -31,7 +38,8 @@ def search_person(
             boost_queries.append(
                 {
                     "match_phrase": {
-                        person["type_person"]
+                        "unite_legale."
+                        + person["type_person"]
                         + "."
                         + person["match_nom"]
                         + ".keyword": {
@@ -43,21 +51,25 @@ def search_person(
             )
 
         # Prénoms
-        prenoms_person = params.get(param_prenom, None)
+        prenoms_person = search_params.dict().get(param_prenom, None)
         if prenoms_person:
             # Same logic as "nom" is used for "prenoms"
             for prenom in prenoms_person.split(" "):
                 person_filters.append(
                     {
                         "match": {
-                            person["type_person"] + "." + person["match_prenom"]: prenom
+                            "unite_legale."
+                            + person["type_person"]
+                            + "."
+                            + person["match_prenom"]: prenom
                         }
                     }
                 )
             boost_queries.append(
                 {
                     "match_phrase": {
-                        person["type_person"]
+                        "unite_legale."
+                        + person["type_person"]
                         + "."
                         + person["match_prenom"]
                         + ".keyword": {
@@ -69,13 +81,14 @@ def search_person(
             )
 
         # Date de naissance
-        min_date_naiss_person = params.get(param_date_min, None)
+        min_date_naiss_person = search_params.dict().get(param_date_min, None)
         if min_date_naiss_person:
             person_filters.append(
                 {
                     "range": {
                         **{
-                            person["type_person"]
+                            "unite_legale."
+                            + person["type_person"]
                             + "."
                             + person["match_date"]: {"gte": min_date_naiss_person}
                         }
@@ -83,13 +96,14 @@ def search_person(
                 }
             )
 
-        max_date_naiss_person = params.get(param_date_max, None)
+        max_date_naiss_person = search_params.dict().get(param_date_max, None)
         if max_date_naiss_person:
             person_filters.append(
                 {
                     "range": {
                         **{
-                            person["type_person"]
+                            "unite_legale."
+                            + person["type_person"]
                             + "."
                             + person["match_date"]: {"lte": max_date_naiss_person}
                         }
@@ -110,7 +124,7 @@ def search_person(
             search_options.append(
                 query.Q(
                     "nested",
-                    path=person["type_person"],
+                    path="unite_legale." + person["type_person"],
                     query=query.Bool(must=person_filters, should=boost_queries),
                 )
             )

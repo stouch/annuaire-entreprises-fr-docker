@@ -1,3 +1,12 @@
-.esdata
-.redisdata
-./tmp
+/.esdata
+/.redisdata
+
+.env
+
+/.venv
+# import data
+/data 
+
+/tmp
+
+__pycache__

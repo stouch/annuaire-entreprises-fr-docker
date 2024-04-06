@@ -1,11 +1,11 @@
 from aio_proxy.search.helpers.elastic_fields import get_elasticsearch_field_name
 
 
-def build_etablissements_filters(**params):
+def build_etablissements_filters(search_params):
     """Three types of searches are implemented to filter `établissements` values:
 
     1. Filter search by exact matches on text values,
-        e.g. : "departement", "code_postal", "commune"
+        e.g. : "departement", "code_postal", "commune", "region"
 
     2. Filter search by matching an id in an array of ids,
         e.g. ids : "id_convention_collective",
@@ -17,6 +17,7 @@ def build_etablissements_filters(**params):
     The parameters relevant to this filter are variables that have both bool values
     indexed in `unité légale` and a list of values indexed in `établissements`
     e.g "convention_collective_renseignee" -> "liste_idcc",
+        "est_bio" -> "liste_id_bio",
         "est_finess" -> "liste_finess",
         "est_uai" -> "liste_uai",
         "est_entrepreneur_spectacle" -> "est_entrepreneur_spectacle",
@@ -26,12 +27,13 @@ def build_etablissements_filters(**params):
     # Id filters are used in the `should` clause
     id_filters = ["id_finess", "id_rge", "id_uai", "id_convention_collective"]
     # Text filters are used in the `must` clause
-    text_filters = ["departement", "code_postal", "commune"]
+    text_filters = ["departement", "code_postal", "commune", "epci", "region"]
     # Bool filters are used in both `must` and `must_not` clauses depending on the
     # filter value
     bool_filters = [
         "convention_collective_renseignee",
         "est_finess",
+        "est_bio",
         "est_uai",
         "est_rge",
     ]
@@ -41,7 +43,7 @@ def build_etablissements_filters(**params):
     must_not_filters = []
 
     # params is the list of parameters (filters) provided in the request
-    for param_name, param_value in params.items():
+    for param_name, param_value in search_params.dict().items():
         should_apply_text_filter = (
             param_value is not None and param_name in text_filters
         )
@@ -49,7 +51,7 @@ def build_etablissements_filters(**params):
             terms_filters.append(
                 {
                     "terms": {
-                        "etablissements." + param_name: param_value,
+                        "unite_legale.etablissements." + param_name: param_value,
                     }
                 }
             )
@@ -59,7 +61,7 @@ def build_etablissements_filters(**params):
             must_filters.append(
                 {
                     "match": {
-                        "etablissements."
+                        "unite_legale.etablissements."
                         + field: {
                             "query": param_value,
                             "_name": "Filter id:" + field,
@@ -77,25 +79,29 @@ def build_etablissements_filters(**params):
         if should_apply_bool_filter:
             field = get_elasticsearch_field_name(param_name)
             if param_value:
-                must_filters.append({"exists": {"field": "etablissements." + field}})
+                must_filters.append(
+                    {"exists": {"field": "unite_legale.etablissements." + field}}
+                )
             else:
                 must_not_filters.append(
-                    {"exists": {"field": "etablissements." + field}}
+                    {"exists": {"field": "unite_legale.etablissements." + field}}
                 )
     return terms_filters, must_filters, must_not_filters
 
 
-def build_nested_etablissements_filters_query(with_inner_hits=False, **params):
+def build_nested_etablissements_filters_query(search_params, with_inner_hits=False):
     filters_query = {
         "nested": {
-            "path": "etablissements",
+            "path": "unite_legale.etablissements",
             "query": {"bool": {}},
         }
     }
 
-    terms_filters, must_filters, must_not_filters = build_etablissements_filters(
-        **params
-    )
+    (
+        terms_filters,
+        must_filters,
+        must_not_filters,
+    ) = build_etablissements_filters(search_params)
 
     if not (terms_filters or must_filters or must_not_filters):
         return None
@@ -109,17 +115,21 @@ def build_nested_etablissements_filters_query(with_inner_hits=False, **params):
 
     if with_inner_hits:
         filters_query["nested"]["inner_hits"] = {
-            "size": params["matching_size"],
-            "sort": {"etablissements.etat_administratif": {"order": "asc"}},
+            "size": search_params.matching_size,
+            "sort": {
+                "unite_legale.etablissements.etat_administratif": {"order": "asc"}
+            },
         }
 
     return filters_query
 
 
-def add_nested_etablissements_filters_to_text_query(text_query, **params):
-    terms_filters, must_filters, must_not_filters = build_etablissements_filters(
-        **params
-    )
+def add_nested_etablissements_filters_to_text_query(text_query, search_params):
+    (
+        terms_filters,
+        must_filters,
+        must_not_filters,
+    ) = build_etablissements_filters(search_params)
     # Number `5` corresponds to the index of the nested query in the text query
     # every time a new query is added to the text query before the nested query,
     # this index should be modified to reflect that change

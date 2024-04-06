@@ -49,12 +49,12 @@ info:
     ## Monitoring de l'API
 
     Une supervision du service en temps réel est
-    disponible [ici](https://annuaire-entreprises.data.gouv.fr/sources-de-donnees#APIRecherched%E2%80%99entreprises).
+    disponible [ici](https://annuaire-entreprises.data.gouv.fr/donnees/api#recherche-entreprise).
 
 
     ## Infolettre
 
-    Vous pouvez vous abonner [ici](https://app.mailjet.com/widget/iframe/zR1/NZO) à
+    Vous pouvez vous abonner [ici](https://2f62ff46.sibforms.com/serve/MUIFAO95z3V-BJo1feDe7qoHnkmSCfysBZZFjIFSjvvnqZ1C8aAGCT1-vESBVRjnjM8fKD_Mt7Q0ENMgGon61yySA7u3dn8MS3rdd5Ax_aQ7ORuB5tglGXJ00VEnG5Tp5ggraqa5x6oPoyaleNDDkDmijlzwmSxWRs5zfSubvr3dGQMlxymwf2uU4xY1N51BjN5F5vvNMDu-s9IT) à
     l'infolettre pour être informé des mises à jour de la part de l’équipe.
 
 openapi: 3.0.0
@@ -77,12 +77,6 @@ paths:
             élus)
           schema:
             type: string
-        - name: nom
-          in: query
-          description: >-
-            Termes de la recherche (dénomination, dirigeants, élus)
-          schema:
-            type: string
         - name: activite_principale
           in: query
           description: >-
@@ -94,6 +88,19 @@ paths:
           required: false
           schema:
             type: string
+        - name: categorie_entreprise
+          in: query
+          description: >-
+            Catégorie d'entreprise de l'unité légale. Ce paramètre accepte une valeur
+            unique ou une liste de valeurs séparées par des virgules.
+          required: false
+          example: "PME,ETI"
+          schema:
+            type: string
+            enum:
+              - PME
+              - ETI
+              - GE
         - name: code_collectivite_territoriale
           in: query
           description: >-
@@ -141,7 +148,7 @@ paths:
           in: query
           description: >-
             <a href=https://www.insee.fr/fr/information/6051727> Code de
-            département en deux chiffres</a>. Ce paramètre filtre sur les
+            département en deux ou trois chiffres</a>. Ce paramètre filtre sur les
             établissements et accepte une valeur unique ou une liste de valeurs
             séparées par des virgules.
           required: false
@@ -149,9 +156,54 @@ paths:
           schema:
             type: string
             pattern: \b([013-8]\d?|2[aAbB1-9]?|9[0-59]?|97[12346])\b
+        - name: region
+          in: query
+          description: >-
+            <a href=https://www.insee.fr/fr/information/6051727> Code de
+            région en deux chiffres</a>. Ce paramètre filtre sur les
+            établissements et accepte une valeur unique ou une liste de valeurs
+            séparées par des virgules.
+          required: false
+          example: "11,76"
+          schema:
+            type: string
+        - name: epci
+          in: query
+          description: >-
+            <a href=https://www.insee.fr/fr/information/2510634>
+            Liste des epci valides</a>. Ce paramètre filtre sur les
+            établissements et accepte une valeur unique ou une liste de valeurs
+            séparées par des virgules.
+          required: false
+          example: "200058519,248100737"
+          schema:
+            type: string
+        - name: egapro_renseignee
+          in: query
+          description: >-
+            Uniquement les entreprises ayant un index égapro renseigné
+          required: false
+          schema:
+            type: boolean
+            enum:
+              - true
+              - false
         - name: est_association
           in: query
-          description: Uniquement les entreprises ayant un identifiant d'association.
+          description: >-
+            Uniquement les entreprises ayant un identifiant d'association ou
+            une nature juridique avec mention "association"
+            (5195, 9210, 9220, 9221, 9222, 9223, 9224, 9230, 9240, 9260).
+          required: false
+          schema:
+            type: boolean
+            enum:
+              - true
+              - false
+        - name: est_bio
+          in: query
+          description: >-
+            Uniquement les entreprises ayant un établissement certifié par l'agence bio
           required: false
           schema:
             type: boolean
@@ -209,10 +261,41 @@ paths:
             enum:
               - true
               - false
+        - name: est_organisme_formation
+          in: query
+          description: >-
+            Uniquement les entreprises ayant un établissement organisme de formation
+          required: false
+          schema:
+            type: boolean
+            enum:
+              - true
+              - false
+        - name: est_qualiopi
+          in: query
+          description: >-
+            Uniquement les entreprises ayant ayant une certification de la marque «
+            Qualiopi »
+          required: false
+          schema:
+            type: boolean
+            enum:
+              - true
+              - false
         - name: est_rge
           in: query
           description: >-
             Uniquement les entreprises reconnues garantes de l'Environnement (RGE).
+          required: false
+          schema:
+            type: boolean
+            enum:
+              - true
+              - false
+        - name: est_siae
+          in: query
+          description: >-
+            Uniquement les structures d'insertion par l'activité économique (SIAE).
           required: false
           schema:
             type: boolean
@@ -225,9 +308,19 @@ paths:
             Uniquement les structures reconnues comme service public.
 
             Attention : Ce filtre se base sur des règles de gestion documentées
-            <a href=https://github.com/etalab/annuaire-entreprises-search-infra/blob/c4820119dfbf480979166540ee64278d33abb772/data_enrichment.py#L70>ici</a>.
+            <a href=https://github.com/etalab/annuaire-entreprises-search-infra/blob/97b81953f060015b881f44482897a066f2cd34cf/data_enrichment.py#L103>ici</a>.
 
             Ce filtre n'est pas exhaustif et peut retourner des faux positifs.
+          required: false
+          schema:
+            type: boolean
+            enum:
+              - true
+              - false
+        - name: est_societe_mission
+          in: query
+          description: >-
+            Uniquement les sociétés qui appartiennent au champ des sociétés à mission.
           required: false
           schema:
             type: boolean
@@ -390,6 +483,38 @@ paths:
             enum:
               - dirigeant
               - elu
+        - name: ca_min
+          in: query
+          description: >-
+            Valeur minimale du chiffre d'affaire de l'entreprise
+          example: "100000"
+          required: false
+          schema:
+            type: integer
+        - name: ca_max
+          in: query
+          description: >-
+            Valeur maximale du chiffre d'affaire de l'entreprise
+          example: "100000"
+          required: false
+          schema:
+            type: integer
+        - name: resultat_net_min
+          in: query
+          description: >-
+            Valeur minimale du résultat net de l'entreprise
+          example: "100000"
+          required: false
+          schema:
+            type: integer
+        - name: resultat_net_max
+          in: query
+          description: >-
+            Valeur maximale du résultat net de l'entreprise
+          example: "100000"
+          required: false
+          schema:
+            type: integer
         - name: limite_matching_etablissements
           in: query
           description: >-
@@ -399,6 +524,46 @@ paths:
           schema:
             type: integer
             default: 10
+        - name: minimal
+          in: query
+          description: >-
+            Permet de retourner une réponse minmale, qui exclut les champs secondaires.
+            Voir "include" pour en savoir plus.
+          required: false
+          schema:
+            type: boolean
+            enum:
+              - true
+              - false
+        - name: include
+          in: query
+          description: >-
+            ATTENTION : Ce paramètre ne peut être
+            appelé qu'avec le champs "minimal=True".
+
+
+            Permet de ne demander que certains des champs secondaires.
+
+
+            Valeurs possibles :
+
+              * complements
+              * dirigeants
+              * finances
+              * matching_etablissements
+              * siege
+              * score
+
+
+            Par défaut tous les champs sont inclus sauf le score.
+
+
+            Ce paramètre accepte une valeur unique ou une liste de valeurs
+            séparées par des virgules.
+
+          example: "siege,complements"
+          schema:
+            type: string
         - name: page
           in: query
           description: Le numéro de la page à retourner.
@@ -439,7 +604,7 @@ paths:
                             denomination de l'unité légale | Nom et prénom | Nom inconnu
                             (dénomination usuelle : construite à partir des trois
                             champs de dénomination usuelle de la base SIRENE) (sigle de
-                            l'unité légale)
+                            l'unité légale).
                           example: "la poste"
                         nom_raison_sociale:
                           type: string
@@ -471,14 +636,21 @@ paths:
                               example: "53.10Z"
                               description: >-
                                 Activité principale de l'établissement (source : base
-                                SIRENE)
+                                SIRENE).
                             activite_principale_registre_metier:
                               type: string
                               nullable: true
                               example: null
                               description: >-
                                 Activité principale de l'établissement au Registre
-                                des Métiers (source : base SIRENE)
+                                des Métiers (source : base SIRENE).
+                            annee_tranche_effectif_salarie:
+                              type: string
+                              nullable: true
+                              example: "2020"
+                              description: >-
+                                Année de validité de la tranche d'effectif salarié de
+                                l'établissement (source : base SIRENE).
                             adresse:
                               type: string
                               example: >-
@@ -492,6 +664,11 @@ paths:
                                 commune |
                                 cedex + libelle cedex) + libelle commune étranger +
                                 libelle pays étranger*
+                            caractere_employeur:
+                              type: string
+                              example: "O"
+                              description: >-
+                                Caractère employeur du siège (source : base SIRENE).
                             cedex:
                               type: string
                               nullable: true
@@ -540,6 +717,13 @@ paths:
                                 Date de création de l'établissement (source : base
                                 SIRENE).
                               example: "2003-01-01"
+                            date_fermeture:
+                              type: string
+                              nullable: true
+                              format: date
+                              description: >-
+                                Date de fermeture de l'établissement (source : base
+                                historique SIRENE).
                             date_debut_activite:
                               type: string
                               format: date
@@ -548,6 +732,14 @@ paths:
                               description: >-
                                 Date de début d'une période de l'historique d'un
                                 établissement (source : base SIRENE).
+                            date_mise_a_jour:
+                              type: string
+                              format: date
+                              nullable: true
+                              example: "2023-09-21T03:34:50"
+                              description: >-
+                                Date du dernier traitement de l'établissement dans le
+                                répertoire Sirene (source : base SIRENE).
                             departement:
                               type: string
                               nullable: true
@@ -655,6 +847,14 @@ paths:
                               items:
                                 type: string
                               example: ["0923"]
+                            liste_id_bio:
+                              type: array
+                              description: >-
+                                Liste des identifiants bio de l'établissement
+                                (source : Agence Bio).
+                              items:
+                                type: string
+                              example: ["0923"]
                             liste_rge:
                               type: array
                               items:
@@ -690,6 +890,19 @@ paths:
                               example: "9"
                               description: >-
                                 Numéro dans la voie (source : base SIRENE).
+                            region:
+                              type: string
+                              nullable: true
+                              example: "11"
+                              description: >-
+                                Code région de l'établissement (source : base
+                                SIRENE).
+                            epci:
+                              type: string
+                              nullable: true
+                              example: "200058519"
+                              description: >-
+                                Numéro siren de l'EPCI.
                             siret:
                               type: string
                               example: "35600000000048"
@@ -711,12 +924,24 @@ paths:
                           example: "1991-01-01"
                           description: >-
                             Date de création de l'unité légale (source : base SIRENE).
+                        date_fermeture:
+                          type: string
+                          format: date
+                          description: >-
+                            Date de fermeture de l'unité légale (source : base
+                            historique SIRENE).
                         tranche_effectif_salarie:
                           type: string
                           example: "53"
                           description: >-
                             Tranche d'effectif salarié de l'unité légale (source :
                             base SIRENE).
+                        annee_tranche_effectif_salarie:
+                          type: string
+                          example: "2020"
+                          description: >-
+                            Année de validité de la tranche d'effectif salarié de
+                            l'unité légale (source : base SIRENE).
                         date_mise_a_jour:
                           type: string
                           format: date
@@ -730,6 +955,19 @@ paths:
                           example: "GE"
                           description: >-
                             Catégorie d'entreprise de l'unité légale (source : base
+                            SIRENE).
+                        caractere_employeur:
+                          type: string
+                          example: "O"
+                          description: >-
+                            Caractère employeur de l'unité légale (source : base
+                            SIRENE).
+                        annee_categorie_entreprise:
+                          type: string
+                          example: "2020"
+                          description: >-
+                            Année de validité correspondant à la catégorie
+                            d'entreprise diffusée (source : base
                             SIRENE).
                         etat_administratif:
                           type: string
@@ -750,7 +988,14 @@ paths:
                         section_activite_principale:
                           type: string
                           example: "H"
-                          description: Calculée à partir de l'activté principale.
+                          description: Calculée à partir de l'activité principale.
+                        statut_diffusion:
+                          type: string
+                          example: "O"
+                          description: >-
+                            Statut de diffusion de l'unité légale.
+                            Toutes les unités légales diffusibles ont le statut de
+                            diffusion à "O". Les unités légales ayant fait l'objet d'une demande d'opposition ont le statut de diffusion à "P" pour diffusion partielle (source : base SIRENE).
                         matching_etablissements:
                           type: array
                           items:
@@ -761,7 +1006,7 @@ paths:
                                 example: "53.10Z"
                                 description: >-
                                   Activité principale de l'établissement (source :
-                                  base SIRENE)
+                                  base SIRENE).
                               adresse:
                                 type: string
                                 example: >-
@@ -773,9 +1018,14 @@ paths:
                                   distribution spéciale + (code postal + libelle
                                   commune | cedex + libelle cedex) + libelle commune
                                   étranger + libelle pays étranger*
+                              caractere_employeur:
+                                type: string
+                                example: "O"
+                                description: >-
+                                  Caractère employeur de l'établissement (source : base SIRENE).
                               commune:
                                 type: string
-                                example: "31150"
+                                example: "75115"
                                 description: >-
                                   Le code géographique de la commune de localisation de
                                   l'établissement, hors adresse à l'étranger (source :
@@ -806,6 +1056,11 @@ paths:
                                 description: >-
                                   Latitude de l'établissement (source : base SIRENE
                                   géocodée par Etalab).
+                              libelle_commune:
+                                type: string
+                                example: "PARIS 15"
+                                description: >-
+                                  Libellé de la commune (source : base SIRENE).
                               liste_enseignes:
                                 type: array
                                 nullable: true
@@ -863,16 +1118,40 @@ paths:
                                 description: >-
                                   Dénomination usuelle de l'établissement (source :
                                   base SIRENE).
+                              region:
+                                type: string
+                                nullable: true
+                                example: "11"
+                                description: >-
+                                  Région de l'établissement (source :
+                                  base SIRENE).
+                              epci:
+                                type: string
+                                nullable: true
+                                example: "200058519"
+                                description: >-
+                                  Numéro siren de l'EPCI.
                               siret:
                                 type: string
                                 example: "35600000000048"
                                 description: le numéro unique de l'établissement.
+                              tranche_effectif_salarie:
+                                type: string
+                                nullable: true
+                                example: "12"
+                                description: >-
+                                  Tranche d'effectif salarié de l'établissement
+                                  (source : base SIRENE).
                         dirigeants:
                           type: array
                           items:
                             oneOf:
                               - $ref: '#/components/schemas/dirigeant_pp'
                               - $ref: '#/components/schemas/dirigeant_pm'
+                        finances:
+                          type: object
+                          $ref: >-
+                            #/components/schemas/finances
                         complements:
                           type: object
                           properties:
@@ -885,6 +1164,21 @@ paths:
                               description: >-
                                 Indique si au moins un établissement a une
                                 convention collective renseignée
+                            egapro_renseignee:
+                              type: boolean
+                              description: >-
+                                Indique si au moins un établissement a un
+                                indice égalité professionnel H/F renseigné
+                            est_association:
+                              type: boolean
+                              example: false
+                              description: >-
+                                Association (source: INSEE)
+                            est_bio:
+                              type: boolean
+                              description: >-
+                                Entreprise ayant au moins un établissement certifié bio
+                                (source: Agence Bio)
                             est_entrepreneur_individuel:
                               type: boolean
                               description: Entreprise individuelle
@@ -897,7 +1191,9 @@ paths:
                               example: false
                             est_ess:
                               type: boolean
-                              description: Entreprise d'économie sociale et solidaire
+                              description: >-
+                                Entreprise d'économie sociale et solidaire
+                                (source: ESS France et INSEE)
                               example: false
                             est_finess:
                               type: boolean
@@ -905,11 +1201,36 @@ paths:
                                 Entreprise ayant au moins un établissement FINESS
                                 (source : Ministère des Solidarités et de la Santé)
                               example: false
+                            est_organisme_formation:
+                              type: boolean
+                              description: >-
+                                Entreprise ayant au moins un établissement organisme de
+                                formation (source: Ministère du Travail)
+                            est_qualiopi:
+                              type: boolean
+                              description: >-
+                                Entreprise ayant une certification de la
+                                marque « Qualiopi » (source: Ministère du Travail)
+                            liste_id_organisme_formation:
+                              type: array
+                              description: >-
+                                Liste des numéro de déclaration d’activité des
+                                établissement organismes de formation
+                                (source : Ministère du Travail).
+                              items:
+                                type: string
+                              example: [ "7423P001123" ]
                             est_rge:
                               type: boolean
                               description: >-
                                 Entreprise ayant au moins un établissement RGE
                                 (source : ADEME)
+                              example: false
+                            est_siae:
+                              type: boolean
+                              description: >-
+                                Structure d'insertion par l'activité économique
+                                (source : Marché de l'Inclusion)
                               example: false
                             est_service_public:
                               type: boolean
@@ -921,6 +1242,12 @@ paths:
 
                                 Ce filtre n'est pas exhaustif et peut retourner des faux positifs.
                               example: false
+                            est_societe_mission:
+                              type: boolean
+                              example: false
+                              description: >-
+                                Société qui appartient au champ des sociétés à
+                                mission.
                             est_uai:
                               type: boolean
                               description: >-
@@ -934,7 +1261,26 @@ paths:
                               example: null
                               description: >-
                                 Numéro au Répertoire National des Associations (RNA)
-                                (source : base SIRENE).
+                                (source : base SIRENE)
+                            statut_bio:
+                              type: boolean
+                              description: >-
+                                Statut des établissements ayant fait une demande de
+                                certification bio
+                                (source: Agence Bio)
+                            statut_entrepreneur_spectacle:
+                              type: string
+                              nullable: true
+                              description: >-
+                                Statut des établissements ayant fait une demande de
+                                licence d'entrepreneur du spectacle
+                                (source: Ministère de la Culture)
+                            type_siae:
+                              type: string
+                              nullable: true
+                              description: >-
+                                Type de structure de l'inclusion
+                                (source: Marché de l'Inclusion)
                   total_results:
                     type: integer
                   page:
@@ -994,7 +1340,7 @@ paths:
             format: float
         - name: radius
           in: query
-          description: Radius de recherche
+          description: Radius de recherche, inférieur ou égal à 50km.
           required: false
           schema:
             type: number
@@ -1058,6 +1404,45 @@ paths:
           schema:
             type: integer
             default: 10
+        - name: minimal
+          in: query
+          description: >-
+            Permet de retourner une réponse minmale, qui exclut les champs secondaires.
+            Voir "include" pour en savoir plus.
+          required: false
+          schema:
+            type: boolean
+            enum:
+              - true
+              - false
+        - name: include
+          in: query
+          description: >-
+            ATTENTION : Ce paramètre ne peut être
+            appelé qu'avec le champs "minimal=True".
+
+
+            Permet de ne demander que certains des champs secondaires.
+
+
+            Valeurs possibles :
+
+              * complements
+              * dirigeants
+              * finances
+              * matching_etablissements
+              * siege
+              * score
+
+
+            Par défaut tous les champs sont inclus sauf le score.
+
+
+            Ce paramètre accepte une valeur unique ou une liste de valeurs
+            séparées par des virgules.
+          example: "siege,complements"
+          schema:
+            type: string
         - name: page
           in: query
           description: Le numéro de la page à retourner
@@ -1120,7 +1505,7 @@ paths:
                           example: 12734
                         nombre_etablissements_ouverts:
                           type: integer
-                          title: Nombre des établissements ouverts de l'unité légale
+                          title: Nombre des établissements ouverts de l'unité légale.
                           example: 9524
                         siege:
                           type: object
@@ -1130,14 +1515,21 @@ paths:
                               example: "53.10Z"
                               description: >-
                                 Activité principale de l'établissement (source : base
-                                SIRENE)
+                                SIRENE).
                             activite_principale_registre_metier:
                               type: string
                               nullable: true
                               example: null
                               description: >-
                                 Activité principale de l'établissement au Registre
-                                des Métiers (source : base SIRENE)
+                                des Métiers (source : base SIRENE).
+                            annee_tranche_effectif_salarie:
+                              type: string
+                              nullable: true
+                              example: "2020"
+                              description: >-
+                                Année de validité de la tranche d'effectif salarié de
+                                l'établissement (source : base SIRENE).
                             adresse:
                               type: string
                               example: >-
@@ -1150,6 +1542,11 @@ paths:
                                 distribution spéciale + (code postal + libelle commune |
                                 cedex + libelle cedex) + libelle commune étranger +
                                 libelle pays étranger*
+                            caractere_employeur:
+                              type: string
+                              example: "O"
+                              description: >-
+                                Caractère employeur du siège (source : base SIRENE).
                             cedex:
                               type: string
                               nullable: true
@@ -1198,6 +1595,13 @@ paths:
                                 Date de création de l'établissement (source : base
                                 SIRENE).
                               example: "2003-01-01"
+                            date_fermeture:
+                              type: string
+                              nullable: true
+                              format: date
+                              description: >-
+                                Date de fermeture de l'établissement (source : base
+                                historique SIRENE).
                             date_debut_activite:
                               type: string
                               format: date
@@ -1206,6 +1610,14 @@ paths:
                               description: >-
                                 Date de début d'une période de l'historique d'un
                                 établissement (source : base SIRENE).
+                            date_mise_a_jour:
+                              type: string
+                              format: date
+                              nullable: true
+                              example: "2023-09-21T03:34:50"
+                              description: >-
+                                Date du dernier traitement de l'établissement dans le
+                                répertoire Sirene (source : base SIRENE).
                             departement:
                               type: string
                               nullable: true
@@ -1312,6 +1724,14 @@ paths:
                               items:
                                 type: string
                               example: [ "0923" ]
+                            liste_id_bio:
+                              type: array
+                              description: >-
+                                Liste des identifiants bio de l'établissement
+                                (source : Agence Bio).
+                              items:
+                                type: string
+                              example: ["7423P001123"]
                             liste_rge:
                               type: array
                               items:
@@ -1347,6 +1767,19 @@ paths:
                               example: "9"
                               description: >-
                                 Numéro dans la voie (source : base SIRENE).
+                            region:
+                              type: string
+                              nullable: true
+                              example: "11"
+                              description: >-
+                                Code région de l'établissement (source : base
+                                SIRENE).
+                            epci:
+                              type: string
+                              nullable: true
+                              example: "200058519"
+                              description: >-
+                                Numéro siren de l'EPCI.
                             siret:
                               type: string
                               example: "35600000000048"
@@ -1368,12 +1801,24 @@ paths:
                           example: "1991-01-01"
                           description: >-
                             Date de création de l'unité légale (source : base SIRENE).
+                        date_fermeture:
+                          type: string
+                          format: date
+                          description: >-
+                            Date de fermeture de l'unité légale (source : base
+                            historique SIRENE).
                         tranche_effectif_salarie:
                           type: string
                           example: "53"
                           description: >-
                             Tranche d'effectif salarié de l'unité légale (source :
                             base SIRENE).
+                        annee_tranche_effectif_salarie:
+                          type: string
+                          example: "2020"
+                          description: >-
+                            Année de validité de la tranche d'effectif salarié de
+                            l'unité légale (source : base SIRENE).
                         date_mise_a_jour:
                           type: string
                           format: date
@@ -1386,7 +1831,20 @@ paths:
                           type: string
                           example: "GE"
                           description: >-
-                            Catégorie d'entreprise de l'unité légale  source : base
+                            Catégorie d'entreprise de l'unité légale (source : base
+                            SIRENE).
+                        caractere_employeur:
+                          type: string
+                          example: "O"
+                          description: >-
+                            Caractère employeur de l'unité légale (source : base
+                            SIRENE).
+                        annee_categorie_entreprise:
+                          type: string
+                          example: "2020"
+                          description: >-
+                            Année de validité correspondant à la catégorie
+                            d'entreprise diffusée (source : base
                             SIRENE).
                         etat_administratif:
                           type: string
@@ -1408,7 +1866,14 @@ paths:
                         section_activite_principale:
                           type: string
                           example: "H"
-                          description: Calculée à partir de l'activté principale.
+                          description: Calculée à partir de l'activité principale.
+                        statut_diffusion:
+                          type: string
+                          example: "O"
+                          description: >-
+                            Statut de diffusion de l'unité légale.
+                            Toutes les unités légales diffusibles ont le statut de
+                            diffusion à "O". Les unités légales ayant fait l'objet d'une demande d'opposition ont le statut de diffusion à "P" pour diffusion partielle (source : base SIRENE).
                         matching_etablissements:
                           type: array
                           items:
@@ -1431,6 +1896,11 @@ paths:
                                   distribution spéciale + (code postal + libelle
                                   commune | cedex + libelle cedex) + libelle commune
                                   étranger + libelle pays étranger*
+                              caractere_employeur:
+                                type: string
+                                example: "O"
+                                description: >-
+                                  Caractère employeur de l'établissement (source : base SIRENE).
                               commune:
                                 type: string
                                 example: "31150"
@@ -1464,6 +1934,11 @@ paths:
                                 description: >-
                                   Latitude de l'établissement (source : base SIRENE
                                   géocodée par Etalab).
+                              libelle_commune:
+                                type: string
+                                example: "PARIS 15"
+                                description: >-
+                                  Libellé de la commune (source : base SIRENE).
                               liste_enseignes:
                                 type: array
                                 nullable: true
@@ -1521,16 +1996,40 @@ paths:
                                 description: >-
                                   Dénomination usuelle de l'établissement (source :
                                   base SIRENE).
+                              region:
+                                type: string
+                                nullable: true
+                                example: "11"
+                                description: >-
+                                  Région de l'établissement (source :
+                                  base SIRENE).
+                              epci:
+                                type: string
+                                nullable: true
+                                example: "200058519"
+                                description: >-
+                                  Numéro siren de l'EPCI.
                               siret:
                                 type: string
                                 example: "35600000000048"
                                 description: le numéro unique de l'établissement.
+                              tranche_effectif_salarie:
+                                type: string
+                                nullable: true
+                                example: "12"
+                                description: >-
+                                  Tranche d'effectif salarié de l'établissement
+                                  (source : base SIRENE).
                         dirigeants:
                           type: array
                           items:
                             oneOf:
                               - $ref: '#/components/schemas/dirigeant_pp'
                               - $ref: '#/components/schemas/dirigeant_pm'
+                        finances:
+                          type: object
+                          $ref: >-
+                            #/components/schemas/finances
                         complements:
                           type: object
                           properties:
@@ -1543,6 +2042,21 @@ paths:
                               description: >-
                                 Indique si au moins un établissement a une
                                 convention collective renseignée
+                            egapro_renseignee:
+                              type: boolean
+                              description: >-
+                                Indique si au moins un établissement a un
+                                indice égalité professionnel H/F renseigné
+                            est_association:
+                              type: boolean
+                              example: false
+                              description: >-
+                                Association (source: INSEE)
+                            est_bio:
+                              type: boolean
+                              description: >-
+                                Entreprise ayant au moins un établissement certifié bio
+                                (source: Agence Bio)
                             est_entrepreneur_individuel:
                               type: boolean
                               description: Entreprise individuelle
@@ -1555,7 +2069,9 @@ paths:
                               example: false
                             est_ess:
                               type: boolean
-                              description: Entreprise d'économie sociale et solidaire
+                              description: >-
+                                Entreprise d'économie sociale et solidaire
+                                (source: ESS France et INSEE)
                               example: false
                             est_finess:
                               type: boolean
@@ -1563,6 +2079,25 @@ paths:
                                 Entreprise ayant au moins un établissement FINESS
                                 (source : Ministère des Solidarités et de la Santé)
                               example: false
+                            est_organisme_formation:
+                              type: boolean
+                              description: >-
+                                Entreprise ayant au moins un établissement organisme de
+                                formation (source: Ministère du Travail)
+                            est_qualiopi:
+                              type: boolean
+                              description: >-
+                                Entreprise ayant une certification de la
+                                marque « Qualiopi » (source: Ministère du Travail)
+                            liste_id_organisme_formation:
+                              type: array
+                              description: >-
+                                Liste des numéro de déclaration d’activité des
+                                établissement organismes de formation
+                                (source : Ministère du Travail).
+                              items:
+                                type: string
+                              example: [ "0923" ]
                             est_rge:
                               type: boolean
                               description: >-
@@ -1579,6 +2114,12 @@ paths:
 
                                 Ce filtre n'est pas exhaustif et peut retourner des faux positifs.
                               example: false
+                            est_societe_mission:
+                              type: boolean
+                              example: false
+                              description: >-
+                                Société qui appartient au champ des sociétés à
+                                mission.
                             est_uai:
                               type: boolean
                               description: >-
@@ -1593,6 +2134,25 @@ paths:
                               description: >-
                                 Numéro au Répertoire National des Associations (RNA)
                                 (source : base SIRENE)
+                            statut_bio:
+                              type: boolean
+                              description: >-
+                                Statut des établissements ayant fait une demande de
+                                certification bio
+                                (source: Agence Bio)
+                            statut_entrepreneur_spectacle:
+                              type: string
+                              nullable: true
+                              description: >-
+                                Statut des établissements ayant fait une demande de
+                                licence d'entrepreneur du spectacle
+                                (source: Ministère de la Culture)
+                            type_siae:
+                              type: string
+                              nullable: true
+                              description: >-
+                                Type de structure de l'inclusion
+                                (source: Marché de l'Inclusion)
                   total_results:
                     type: integer
                   page:
@@ -1622,6 +2182,25 @@ paths:
             curl -X GET "https://recherche-entreprises.api.gouv.fr/near_point?lat=45.0428&long=-0.679&radius=5&page=1&per_page=10" -H  "accept: application/json"
 components:
   schemas:
+    finances:
+      type: object
+      properties:
+        2021:
+          $ref: '#/components/schemas/annee_cloture_exercice'
+    annee_cloture_exercice:
+      type: object
+      properties:
+        ca:
+          type: integer
+          format: int64
+          example: 26617000000
+        resultat_net:
+          type: integer
+          format: int64
+          example: 2597000000
+      required:
+        - ca
+        - resultat_net
     dirigeant_pp:
       type: object
       description: >-
@@ -1639,10 +2218,18 @@ components:
           type: string
           description: Année de naissance du dirigeant
           example: '1964'
+        date_de_naissance:
+          type: string
+          description: Année et mois de naissance du dirigeant
+          example: '1964-09'
         qualite:
           type: string
           description: Qualité du dirigeant
           example: Directeur général
+        nationalite:
+          type: string
+          description: Nationalité du dirigeant
+          example: Française
         type_dirigeant:
           type: string
           description: >-
@@ -1659,9 +2246,6 @@ components:
         denomination:
           type: string
           description: Dénomination de l'unité légale
-        sigle:
-          type: string
-          description: Sigle de l'unité légale
         qualite:
           type: string
           description: Qualité du dirigeant
