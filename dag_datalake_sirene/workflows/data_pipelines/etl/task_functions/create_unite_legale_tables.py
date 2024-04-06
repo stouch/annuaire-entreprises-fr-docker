@@ -32,6 +32,17 @@ from dag_datalake_sirene.config import (
     SIRENE_DATABASE_LOCATION,
 )
 
+def create_empty_table(query, table_name, index):
+    sqlite_client = create_table_model(
+        table_name=table_name,
+        create_table_query=query,
+        create_index_func=create_unique_index,
+        index_name=index,
+        index_column="siren",
+    )
+    sqlite_client.commit_and_close_conn()
+    return 0
+
 
 def create_table(query, table_name, index, sirene_file_type):
     sqlite_client = create_table_model(
@@ -79,6 +90,12 @@ def replace_unite_legale_table():
         query=replace_table_unite_legale_query,
     )
 
+def create_flux_unite_legale_table(**kwargs):
+    counts = create_empty_table(
+        create_table_flux_unite_legale_query,
+        "flux_unite_legale",
+        "index_flux_siren",
+    )
 
 def create_historique_unite_legale_table(**kwargs):
     table_name = "historique_unite_legale"

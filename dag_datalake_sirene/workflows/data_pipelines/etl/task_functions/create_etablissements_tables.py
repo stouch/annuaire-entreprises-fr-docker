@@ -32,6 +32,9 @@ from dag_datalake_sirene.workflows.data_pipelines.etl.sqlite.queries.etablisseme
     count_nombre_etablissements_ouverts_query,
     insert_remaining_rne_sieges_data_into_main_table_query,
     update_sieges_table_fields_with_rne_data_query,
+    create_table_flux_etablissements_query,
+    replace_table_siret_siege_query,
+    replace_table_etablissement_query,
 )
 # fmt: on
 from dag_datalake_sirene.config import DATA_DIR
@@ -60,6 +63,16 @@ def create_etablissements_table():
     del df_dep
     sqlite_client.commit_and_close_conn()
 
+def create_flux_etablissements_table():
+    sqlite_client = create_table_model(
+        table_name="flux_siret",
+        create_table_query=create_table_flux_etablissements_query,
+        create_index_func=create_index,
+        index_name="index_flux_siret",
+        index_column="siren",
+    )
+    sqlite_client.commit_and_close_conn()
+
 def create_siege_only_table(**kwargs):
     sqlite_client = create_table_model(
         table_name="siretsiege",
@@ -77,6 +90,15 @@ def create_siege_only_table(**kwargs):
     #airflow: kwargs["ti"].xcom_push(key="count_sieges", value=count_sieges[0])
     sqlite_client.commit_and_close_conn()
 
+def replace_etablissements_table():
+    return execute_query(
+        query=replace_table_etablissement_query,
+    )
+
+def replace_siege_only_table():
+    return execute_query(
+        query=replace_table_siret_siege_query,
+    )
 
 def count_nombre_etablissements():
     sqlite_client = create_table_model(
