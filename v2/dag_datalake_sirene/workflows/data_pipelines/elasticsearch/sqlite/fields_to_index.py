@@ -382,8 +382,8 @@ select_fields_to_index_query = """SELECT
             est_qualiopi,
             (SELECT liste_id_organisme_formation FROM organisme_formation
             WHERE siren = ul.siren)  as liste_id_organisme_formation,
-            (SELECT est_siae  FROM marche_inclusion WHERE siren = ul.siren) AS est_siae,
-            (SELECT type_siae FROM marche_inclusion WHERE siren = ul.siren) AS type_siae
+            NULL AS est_siae,
+            NULL AS type_siae
             FROM
                 unite_legale ul
             LEFT JOIN

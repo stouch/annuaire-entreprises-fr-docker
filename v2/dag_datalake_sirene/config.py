@@ -1,5 +1,6 @@
 #from airflow.models import Variable
 import json
+import os
 
 # Airflow
 #AIRFLOW_DAG_HOME = Variable.get("AIRFLOW_DAG_HOME", "/opt/airflow/dags/")
@@ -20,12 +21,11 @@ import json
 
 DATA_TMP = "./tmp/" # dont forget the trailing slash
 DATA_DIR = "./data/"
-DATA_ENV = "dev"
+DATA_ENV = "prod"
 
 SIRENE_DATABASE_LOCATION = DATA_DIR + "sirene.db"
 SIRENE_MINIO_DATA_PATH = "sirene/database/"
-RNE_DATABASE_LOCATION = DATA_DIR + "rne.db" # dont have this data outside official Etalab env
-
+#RNE_DATABASE_LOCATION = DATA_DIR + "rne.db"
 #RNE_DB_TMP_FOLDER = f"{DATA_TMP}rne/database/"
 #RNE_MINIO_DATA_PATH = "rne/database/"
 #RNE_LATEST_DATE_FILE = "latest_rne_date.json"
@@ -82,23 +82,27 @@ RNE_DATABASE_LOCATION = DATA_DIR + "rne.db" # dont have this data outside offici
 REDIS_HOST = "redis"
 REDIS_PORT = "6379"
 REDIS_DB = "0"
+REDIS_PASSWORD = os.getenv('REDIS_PASSWORD')
 
 # ElasticSearch
+ELASTIC_URL = os.getenv('ELASTIC_URL')
+ELASTIC_USER = os.getenv('ELASTIC_USER') if os.getenv('ELASTIC_USER') else False
+ELASTIC_PASSWORD = os.getenv('ELASTIC_PASSWORD') if os.getenv('ELASTIC_PASSWORD') else False
 ELASTIC_BULK_SIZE = 1500
 ELASTIC_SHARDS = 2
 ELASTIC_REPLICAS = 0
 
 ELASTIC_MAX_LIVE_VERSIONS = 1
 
-ELASTIC_SNAPSHOT_REPOSITORY = "data-prod"
-ELASTIC_SNAPSHOT_MAX_REVISIONS = 5
-ELASTIC_SNAPSHOT_MINIO_STATE_PATH = "elastic_index_version"
+#ELASTIC_SNAPSHOT_REPOSITORY = "data-prod"
+#ELASTIC_SNAPSHOT_MAX_REVISIONS = 5
+#ELASTIC_SNAPSHOT_MINIO_STATE_PATH = "elastic_index_version"
 
-ELASTIC_DOWNSTREAM_ALIAS = "siren-reader"
+#ELASTIC_DOWNSTREAM_ALIAS = "siren-reader"
 # comma separated URL
-ELASTIC_DOWNSTREAM_URLS = ""
-ELASTIC_DOWNSTREAM_USER = ""
-ELASTIC_DOWNSTREAM_PASSWORD = ""
+#ELASTIC_DOWNSTREAM_URLS = ""
+#ELASTIC_DOWNSTREAM_USER = ""
+#ELASTIC_DOWNSTREAM_PASSWORD = ""
 
 #API_IS_REMOTE = Variable.get("API_IS_REMOTE", "False").lower() not in ["false", "0"]
 

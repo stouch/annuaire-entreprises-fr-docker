@@ -30,7 +30,6 @@ from dag_datalake_sirene.workflows.data_pipelines.etl.sqlite.helpers import (
 from dag_datalake_sirene.config import DATA_DIR
 from dag_datalake_sirene.config import (
     SIRENE_DATABASE_LOCATION,
-    RNE_DATABASE_LOCATION,
 )
 
 
@@ -79,33 +78,6 @@ def replace_unite_legale_table():
     return execute_query(
         query=replace_table_unite_legale_query,
     )
-
-
-def add_rne_data_to_unite_legale_table(**kwargs):
-    # Connect to the main database (SIRENE)
-    sqlite_client_siren = SqliteClient(SIRENE_DATABASE_LOCATION)
-
-    # Attach the RNE database
-    sqlite_client_siren.connect_to_another_db(RNE_DATABASE_LOCATION, "db_rne")
-
-    try:
-        sqlite_client_siren.execute(update_main_table_fields_with_rne_data_query)
-        # (handling duplicates with INSERT OR IGNORE)
-        sqlite_client_siren.execute(insert_remaining_rne_data_into_main_table_query)
-
-        sqlite_client_siren.commit_and_close_conn()
-
-    except sqlite3.IntegrityError as e:
-        # Log the error and problematic siren values
-        logging.error(f"IntegrityError: {e}")
-        problematic_sirens = e.args[0].split(": ")[1].split(", ")
-        logging.error(f"Problematic Sirens: {problematic_sirens}")
-        raise e
-
-    except Exception as e:
-        # Handle other exceptions if needed
-        logging.error(f"An unexpected error occurred: {e}")
-        raise e
 
 
 def create_historique_unite_legale_table(**kwargs):

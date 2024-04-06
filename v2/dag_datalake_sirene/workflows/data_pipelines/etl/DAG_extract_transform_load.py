@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 # fmt: off
 from dag_datalake_sirene.workflows.data_pipelines.etl.task_functions.\
     create_etablissements_tables import (
-    add_rne_data_to_siege_table,
     count_nombre_etablissements,
     count_nombre_etablissements_ouverts,
     create_etablissements_table,
@@ -11,8 +10,6 @@ from dag_datalake_sirene.workflows.data_pipelines.etl.task_functions.\
     create_historique_etablissement_table,
     create_siege_only_table,
     insert_date_fermeture_etablissement,
-    replace_etablissements_table,
-    replace_siege_only_table,
 )
 
 from dag_datalake_sirene.workflows.data_pipelines.etl.task_functions.\
@@ -48,24 +45,21 @@ from dag_datalake_sirene.workflows.data_pipelines.etl.task_functions.\
     create_unite_legale_table,
     insert_date_fermeture_unite_legale,
     replace_unite_legale_table,
-    add_rne_data_to_unite_legale_table,
 )
 
 # fmt: on
 
-#create_sqlite_database()
+create_sqlite_database()
 
-#create_unite_legale_table()
-#create_historique_unite_legale_table()
-#create_date_fermeture_unite_legale_table()
+create_unite_legale_table()
+create_historique_unite_legale_table()
+create_date_fermeture_unite_legale_table()
 create_etablissements_table()
 replace_unite_legale_table()
 insert_date_fermeture_unite_legale()
-replace_etablissements_table()
 count_nombre_etablissements()
 count_nombre_etablissements_ouverts()
 create_siege_only_table()
-replace_siege_only_table()
 create_historique_etablissement_table()
 create_date_fermeture_etablissement_table()
 insert_date_fermeture_etablissement()

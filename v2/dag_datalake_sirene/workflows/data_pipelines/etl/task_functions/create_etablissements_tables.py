@@ -19,7 +19,6 @@ from dag_datalake_sirene.workflows.data_pipelines.etl.sqlite.helpers import (
 )
 from dag_datalake_sirene.workflows.data_pipelines.etl.sqlite.queries.etablissements\
     import (
-    create_table_flux_etablissements_query,
     create_table_etablissements_query,
     create_table_historique_etablissement_query,
     create_table_date_fermeture_etablissement_query,
@@ -27,8 +26,6 @@ from dag_datalake_sirene.workflows.data_pipelines.etl.sqlite.queries.etablisseme
     insert_date_fermeture_etablissement_query,
     insert_date_fermeture_siege_query,
     populate_table_siret_siege_query,
-    replace_table_etablissement_query,
-    replace_table_siret_siege_query,
     create_table_count_etablissements_query,
     count_nombre_etablissements_query,
     create_table_count_etablissements_ouverts_query,
@@ -40,7 +37,6 @@ from dag_datalake_sirene.workflows.data_pipelines.etl.sqlite.queries.etablisseme
 from dag_datalake_sirene.config import DATA_DIR
 from dag_datalake_sirene.config import (
     SIRENE_DATABASE_LOCATION,
-    RNE_DATABASE_LOCATION,
 )
 
 
@@ -82,18 +78,6 @@ def create_siege_only_table(**kwargs):
     sqlite_client.commit_and_close_conn()
 
 
-def replace_etablissements_table():
-    return execute_query(
-        query=replace_table_etablissement_query,
-    )
-
-
-def replace_siege_only_table():
-    return execute_query(
-        query=replace_table_siret_siege_query,
-    )
-
-
 def count_nombre_etablissements():
     sqlite_client = create_table_model(
         table_name="count_etab",
@@ -117,36 +101,6 @@ def count_nombre_etablissements_ouverts():
     )
     sqlite_client.execute(count_nombre_etablissements_ouverts_query)
     sqlite_client.commit_and_close_conn()
-
-
-def add_rne_data_to_siege_table(**kwargs):
-    # Connect to the first database
-    sqlite_client_siren = SqliteClient(SIRENE_DATABASE_LOCATION)
-
-    # Attach the RNE database
-    sqlite_client_siren.connect_to_another_db(RNE_DATABASE_LOCATION, "db_rne")
-
-    try:
-        # Update existing rows in main sieges table based on siren from rne.sieges
-        sqlite_client_siren.execute(update_sieges_table_fields_with_rne_data_query)
-
-        # Handling duplicates with INSERT OR IGNORE
-        sqlite_client_siren.execute(
-            insert_remaining_rne_sieges_data_into_main_table_query
-        )
-
-        sqlite_client_siren.commit_and_close_conn()
-
-    except sqlite3.IntegrityError as e:
-        # Log the error and problematic siren values
-        logging.error(f"IntegrityError: {e}")
-        problematic_sirens = e.args[0].split(": ")[1].split(", ")
-        logging.error(f"Problematic Sirens: {problematic_sirens}")
-
-    except Exception as error:
-        # Handle other exceptions if needed
-        logging.error(f"An unexpected error occurred: {error}")
-        raise error
 
 
 def create_historique_etablissement_table(**kwargs):

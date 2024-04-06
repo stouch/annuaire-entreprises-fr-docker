@@ -32,7 +32,6 @@ from dag_datalake_sirene.workflows.data_pipelines.etl.sqlite.queries import (
     entrepreneur_spectacle as q_es,
     colter as q_ct,
     uai as q_uai,
-    marche_inclusion as q_mi,
 )
 
 

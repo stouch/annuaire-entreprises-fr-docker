@@ -39,11 +39,17 @@ class ElasticCreateIndex:
         self.elastic_bulk_size = elastic_bulk_size
 
         # initiate the default connection to elasticsearch
-        connections.create_connection(
-            hosts=[self.elastic_url],
-            http_auth=(self.elastic_user, self.elastic_password),
-            retry_on_timeout=True,
-        )
+        if(self.elastic_user and self.elastic_password):
+            connections.create_connection(
+                hosts=[self.elastic_url],
+                http_auth=(self.elastic_user, self.elastic_password),
+                retry_on_timeout=True,
+            )
+        else:
+            connections.create_connection(
+                hosts=[self.elastic_url],
+                retry_on_timeout=True,
+            )
 
         self.elastic_connection = connections.get_connection()
         self.elastic_health = self.elastic_connection.cluster.health()
