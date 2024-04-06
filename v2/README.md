@@ -1,3 +1,10 @@
+## Requirements 
+
+- docker
+- docker-compose 
+- python3
+- pip3
+
 ## Presentation 
 
 ### Data import
@@ -21,7 +28,26 @@ To make work the request SSL downloads:
 ln -s /etc/ssl/* /Library/Frameworks/Python.framework/Versions/Current/etc/openssl/
 ```
 
+### Start databases
+
+This elasticsearch db will store all the enterprise data in a persistent local storage (./.esdata).
+
+```bash
+mkdir ./.esdata
+# chown the ./.esdata, make sure that docker will be able to write in it.
+
+# Feel free to adjust the 8g RAM heap size (docker-compose.yml)
+docker compose up -d elasticsearch 
+```
+
+Start redis:
+```bash
+docker compose up -d redis
+``` 
+
 ### Import data:
+
+It takes up to 6 to 24 hours depending your server performance.
 
 ```bash
 python3 -m venv .venv
@@ -32,3 +58,10 @@ python3 import.py
 
 ## Usage
 
+AIO API gonna host the python search API
+
+```bash
+docker compose up -d http-proxy
+```
+
+Then you can fetch the API: `http://localhost:4500/search?q=Carrefour+chalon+sur+saone`
