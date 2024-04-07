@@ -38,7 +38,9 @@ This elasticsearch db will store all the enterprise data in a persistent local s
 mkdir ./.esdata
 # chown the ./.esdata, make sure that docker will be able to write in it.
 
-# Feel free to adjust the 8g RAM heap size (docker-compose.yml)
+# Feel free to:
+# - Adjust the 8g RAM heap size (docker-compose.yml)
+# - Choose a specific location for your elastic data (needs at least 70GB)
 docker compose up -d elasticsearch
 ```
 
@@ -50,18 +52,26 @@ docker compose up -d redis
 
 ### Import data:
 
-It takes up to 6 to 24 hours depending your server performance.
+- Source data import (downloads + sqlite indexation):
+  - (8 CPU + 16GB RAM, 70GB high-speed disk for sqlite data): About 4h
+- Elastic indexation: (16 CPU + 32GB RAM, 70GB high-speed disk):
+  - (16 CPU + 32GB RAM, 70GB high-speed disk for elastic data): About 7h
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip3 install -r requirements.txt
-python3 import.py
+
+cp .env.sample .env
+nano .env # Choose the DATA_DIR for import data
+
+#python3 import.py # Executes both import and elastic indexation \/
+nohup python import.py > output.log 2>&1 &
 ```
 
 ## Usage
 
-AIO API gonna host the python search API
+`aio` proxy hosts the python search API:
 
 ```bash
 docker compose up -d http-proxy
