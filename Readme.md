@@ -39,14 +39,18 @@ mkdir ./.esdata
 # chown the ./.esdata, make sure that docker will be able to write in it.
 
 # Feel free to:
-# - Adjust the 8g RAM heap size (docker-compose.yml)
-# - Choose a specific location for your elastic data (needs at least 70GB)
+# - Adjust the 8g RAM heap size (docker-compose.yml) to at least 14g
+# - Choose a specific location for your elastic data (needs at least 70GB) instead of .esdata
+nano docker-compose.yml
 docker compose up -d elasticsearch
 ```
 
 Start redis:
 
 ```bash
+# - You can choose specific location for redis data
+# - Adjust memory parameter to at least 14gb
+nano docker-compose.yml
 docker compose up -d redis
 ```
 
