@@ -1,4 +1,4 @@
-def build_text_query(terms: str, matching_size: int):
+def build_text_query(terms: str, matching_size: int, search_in_address: bool):
     min_etab_ouverts_multiplier = {
         "field": "nombre_etablissements_ouverts",
         "factor": 1,
@@ -269,4 +269,21 @@ def build_text_query(terms: str, matching_size: int):
             ],
         }
     }
+
+    if not search_in_address:
+        text_query["bool"]["should"][5]["function_score"]["query"]["nested"]["query"]["bool"]["should"][8] = {
+            "multi_match": {
+                "query": terms,
+                "fields": [
+                    "unite_legale.etablissements.nom_complet^15",
+                    "unite_legale.etablissements.enseigne_1",
+                    "unite_legale.etablissements.enseigne_2",
+                    "unite_legale.etablissements.enseigne_3",
+                    "unite_legale.etablissements.nom_commercial",
+                ],
+                "type": "cross_fields",
+                "operator": "AND",
+                "_name": "match nom complet seulement",
+            }
+        }
     return text_query

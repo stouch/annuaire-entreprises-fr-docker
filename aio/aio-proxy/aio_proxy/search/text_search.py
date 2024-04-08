@@ -140,6 +140,7 @@ def build_es_search_text_query(es_search_builder):
                 text_query = build_text_query(
                     terms=query_terms,
                     matching_size=es_search_builder.search_params.matching_size,
+                    search_in_address=not es_search_builder.search_params.exclude_adresse_q
                 )
                 text_query_with_filters = (
                     add_nested_etablissements_filters_to_text_query(
@@ -168,6 +169,7 @@ def build_es_search_text_query(es_search_builder):
             text_query = build_text_query(
                 terms=query_terms,
                 matching_size=es_search_builder.search_params.matching_size,
+                search_in_address=not es_search_builder.search_params.exclude_adresse_q
             )
             es_search_builder.es_search_client = (
                 es_search_builder.es_search_client.query(Q(text_query))

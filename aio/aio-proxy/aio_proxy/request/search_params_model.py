@@ -20,6 +20,7 @@ from pydantic import BaseModel, field_validator, model_validator
 class SearchParams(BaseModel):
     """Class for modeling search parameters"""
 
+    exclude_adresse_q: bool | None = None
     page: int = 1
     page_etablissements: int | None = None
     per_page: int = 10
@@ -194,6 +195,7 @@ class SearchParams(BaseModel):
         return value
 
     @field_validator(
+        "exclude_adresse_q",
         "est_entrepreneur_individuel",
         "convention_collective_renseignee",
         "egapro_renseignee",
